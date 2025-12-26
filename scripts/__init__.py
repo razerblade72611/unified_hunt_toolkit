@@ -1,0 +1,1 @@
+# Omphalos hunt scripts package

@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Omphalos Map v0</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: #000;
+      color: #eee;
+      font-family: system-ui, sans-serif;
+    }
+    #info {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,0.6);
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      max-width: 420px;
+    }
+    #info b {
+      color: #8fd3ff;
+    }
+    #canvas-container {
+      width: 100vw;
+      height: 100vh;
+    }
+    #point-label {
+      position: absolute;
+      z-index: 20;
+      padding: 2px 6px;
+      font-size: 11px;
+      border-radius: 4px;
+      background: rgba(0,0,0,0.8);
+      border: 1px solid #8fd3ff;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+      white-space: nowrap;
+      display: none;
+    }
+    .toggle-group {
+      margin-top: 6px;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+    .toggle-group label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 2px;
+    }
+    .color-swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 2px;
+      margin-right: 4px;
+      border: 1px solid #222;
+      display: inline-block;
+    }
+    .swatch-poi {
+      background: #55ffff;
+    }
+    .swatch-permit {
+      background: #ff5555;
+    }
+    .swatch-tagged {
+      background: #88ff88;
+    }
+    .swatch-background {
+      background: #888888;
+    }
+    .toggle-group input[type="checkbox"] {
+      margin-right: 4px;
+    }
+    .section-title {
+      margin-top: 6px;
+      font-weight: bold;
+      font-size: 11px;
+      color: #ccc;
+    }
+    hr {
+      border: none;
+      border-top: 1px solid #444;
+      margin: 6px 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="info">
+    <b>Omphalos Map v0</b><br/>
+    Left-drag: rotate · Right-drag: pan · Scroll: zoom · Click: select system
+    <div class="section-title">Layers / Legend</div>
+    <div class="toggle-group">
+      <label>
+        <span class="color-swatch swatch-poi"></span>
+        <input type="checkbox" id="togglePoi" checked>
+        POI systems (poi_count &gt; 0)
+      </label>
+      <label>
+        <span class="color-swatch swatch-permit"></span>
+        <input type="checkbox" id="togglePermit" checked>
+        Permit-locked systems
+      </label>
+      <label>
+        <span class="color-swatch swatch-tagged"></span>
+        <input type="checkbox" id="toggleTagged" checked>
+        Tagged / categorized systems
+      </label>
+      <label>
+        <span class="color-swatch swatch-background"></span>
+        <input type="checkbox" id="toggleBackground" checked>
+        Background systems
+      </label>
+    </div>
+    <hr/>
+    <div class="section-title">System Info</div>
+    <div id="system-info"></div>
+  </div>
+
+  <div id="canvas-container"></div>
+  <div id="point-label"></div>
+
+  <script type="module">
+    import * as THREE from "https://unpkg.com/three@0.160.0?module";
+    import { OrbitControls } from "https://unpkg.com/three@0.160.0/examples/jsm/controls/OrbitControls.js?module";
+
+    // Absolute path so it always resolves from the server root
+    const DATA_URL = "/data/processed/omphalos_map.json";
+
+    const container = document.getElementById("canvas-container");
+    const infoBox = document.getElementById("system-info");
+    const labelDiv = document.getElementById("point-label");
+
+    const chkPoi = document.getElementById("togglePoi");
+    const chkPermit = document.getElementById("togglePermit");
+    const chkTagged = document.getElementById("toggleTagged");
+    const chkBackground = document.getElementById("toggleBackground");
+
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.PerspectiveCamera(
+      60,
+      window.innerWidth / window.innerHeight,
+      1,
+      200000
+    );
+    camera.position.set(0, 0, 5000);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    container.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+
+    const light = new THREE.AmbientLight(0xffffff, 0.7);
+    scene.add(light);
+
+    const axes = new THREE.AxesHelper(1000);
+    scene.add(axes);
+
+    const SCALE = 4.0; // shrink galaxy coordinates into viewable space
+
+    // category -> [{ sys, pos }]
+    const categoryData = {
+      poi: [],
+      permit: [],
+      tagged: [],
+      background: []
+    };
+
+    // list of Points meshes
+    const pointsMeshes = [];
+
+    let selectedEntry = null; // { sys, pos }
+
+    function scaleCoord(v) {
+      return v / SCALE;
+    }
+
+    // More robust boolean check for permit flag
+    function isPermitLocked(sys) {
+      const rp = sys.require_permit;
+      const pn = sys.permit_name;
+
+      if (rp === true) return true;
+      if (typeof rp === "string") {
+        const rps = rp.toLowerCase().trim();
+        if (rps === "true" || rps === "1" || rps === "yes") return true;
+      }
+      if (pn && pn.trim().length > 0) return true;
+
+      return false;
+    }
+
+    function hasTagsOrCategory(sys) {
+      const tagsStr = (sys.tags || "") + " " + (sys.category || "");
+      const cleaned = tagsStr.trim();
+      if (!cleaned) return false;
+      if (cleaned === "[]") return false;
+      return true;
+    }
+
+    // Classification priority: permit -> poi -> tagged -> background
+    function classifySystem(sys) {
+      const hasPOI = (sys.poi_count || 0) > 0;
+      const permit = isPermitLocked(sys);
+      const tagged = hasTagsOrCategory(sys);
+
+      if (permit) return "permit";
+      if (hasPOI) return "poi";
+      if (tagged) return "tagged";
+      return "background";
+    }
+
+    // Constant colors per category (match legend swatches)
+    const CAT_COLORS = {
+      poi: new THREE.Color(0x55ffff),
+      permit: new THREE.Color(0xff5555),
+      tagged: new THREE.Color(0x88ff88),
+      background: new THREE.Color(0x888888)
+    };
+
+    function createPointsForCategory(catName) {
+      const arr = categoryData[catName];
+      if (!arr.length) return;
+
+      const positions = new Float32Array(arr.length * 3);
+      const colors = new Float32Array(arr.length * 3);
+      const c = CAT_COLORS[catName] || new THREE.Color(0xffffff);
+
+      arr.forEach((entry, idx) => {
+        const pos = entry.pos;
+        positions[idx * 3 + 0] = pos.x;
+        positions[idx * 3 + 1] = pos.y;
+        positions[idx * 3 + 2] = pos.z;
+
+        colors[idx * 3 + 0] = c.r;
+        colors[idx * 3 + 1] = c.g;
+        colors[idx * 3 + 2] = c.b;
+      });
+
+      const geometry = new THREE.BufferGeometry();
+      geometry.setAttribute("position", new THREE.BufferAttribute(positions, 3));
+      geometry.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+
+      const material = new THREE.PointsMaterial({
+        size: 5,
+        vertexColors: true
+      });
+
+      const points = new THREE.Points(geometry, material);
+      points.userData.category = catName;
+      scene.add(points);
+      pointsMeshes.push(points);
+    }
+
+    function loadData() {
+      fetch(DATA_URL)
+        .then(r => r.json())
+        .then(data => {
+          const systems = data.systems || [];
+          console.log("Loaded systems:", systems.length);
+
+          systems.forEach(sys => {
+            const cat = classifySystem(sys);
+            const pos = new THREE.Vector3(
+              scaleCoord(sys.x),
+              scaleCoord(sys.y),
+              scaleCoord(sys.z)
+            );
+            categoryData[cat].push({ sys, pos });
+          });
+
+          console.log("Category counts:", {
+            poi: categoryData.poi.length,
+            permit: categoryData.permit.length,
+            tagged: categoryData.tagged.length,
+            background: categoryData.background.length
+          });
+
+          // Create separate point clouds per category
+          createPointsForCategory("poi");
+          createPointsForCategory("permit");
+          createPointsForCategory("tagged");
+          createPointsForCategory("background");
+
+          applyToggleVisibility();
+        })
+        .catch(err => {
+          console.error("Failed to load map JSON:", err);
+          infoBox.innerHTML = "Failed to load omphalos_map.json";
+        });
+    }
+
+    function applyToggleVisibility() {
+      pointsMeshes.forEach(mesh => {
+        const cat = mesh.userData.category;
+        if (cat === "poi") mesh.visible = chkPoi.checked;
+        if (cat === "permit") mesh.visible = chkPermit.checked;
+        if (cat === "tagged") mesh.visible = chkTagged.checked;
+        if (cat === "background") mesh.visible = chkBackground.checked;
+      });
+    }
+
+    function setSelectedEntry(entry) {
+      selectedEntry = entry;
+      if (!entry) {
+        labelDiv.style.display = "none";
+        return;
+      }
+      labelDiv.textContent = entry.sys.name;
+      labelDiv.style.display = "block";
+      updateLabelPosition(); // position immediately
+    }
+
+    function updateLabelPosition() {
+      if (!selectedEntry) {
+        labelDiv.style.display = "none";
+        return;
+      }
+      const pos = selectedEntry.pos.clone();
+      pos.project(camera);
+
+      const x = (pos.x * 0.5 + 0.5) * window.innerWidth;
+      const y = (-pos.y * 0.5 + 0.5) * window.innerHeight;
+
+      labelDiv.style.left = x + "px";
+      labelDiv.style.top = y + "px";
+    }
+
+    function onWindowResize() {
+      const w = window.innerWidth;
+      const h = window.innerHeight;
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      renderer.setSize(w, h);
+      updateLabelPosition();
+    }
+
+    function onMouseClick(event) {
+      if (!pointsMeshes.length) return;
+
+      const rect = renderer.domElement.getBoundingClientRect();
+      mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      mouse.y = - ((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      raycaster.setFromCamera(mouse, camera);
+      const intersects = raycaster.intersectObjects(pointsMeshes);
+
+      if (intersects.length > 0) {
+        const first = intersects[0];
+        const mesh = first.object;
+        const idx = first.index;
+        const cat = mesh.userData.category;
+
+        const entry = categoryData[cat][idx];
+        if (entry) {
+          showSystemInfo(entry.sys);
+          setSelectedEntry(entry);
+        }
+      }
+    }
+
+    function showSystemInfo(sys) {
+      const parts = [];
+      parts.push(`<b>${sys.name}</b>`);
+
+      const dist = sys.distance_to_sol;
+      if (typeof dist === "number") {
+        parts.push(`Distance from Sol: ${dist.toFixed(1)} ly`);
+      } else if (typeof dist === "string" && dist.trim() !== "") {
+        parts.push(`Distance from Sol: ${dist} ly`);
+      }
+
+      if (sys.region_name) {
+        parts.push(`Region: ${sys.region_name}`);
+      }
+      if (sys.primary_star_type) {
+        parts.push(`Primary star: ${sys.primary_star_type}`);
+      }
+
+      if (isPermitLocked(sys)) {
+        parts.push(`Permit: ${sys.permit_name || "Required"}`);
+      }
+
+      if (sys.poi_count && sys.poi_count > 0) {
+        parts.push(`POIs: ${sys.poi_count}`);
+      }
+
+      const tagsStr = (sys.tags || "").trim();
+      const catStr = (sys.category || "").trim();
+      if (tagsStr || catStr) {
+        parts.push(`Tags: ${[tagsStr, catStr].filter(Boolean).join(" | ")}`);
+      }
+
+      infoBox.innerHTML = parts.join("<br/>");
+    }
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+      updateLabelPosition();
+    }
+
+    // Event wiring
+    window.addEventListener("resize", onWindowResize);
+    window.addEventListener("click", onMouseClick);
+
+    chkPoi.addEventListener("change", applyToggleVisibility);
+    chkPermit.addEventListener("change", applyToggleVisibility);
+    chkTagged.addEventListener("change", applyToggleVisibility);
+    chkBackground.addEventListener("change", applyToggleVisibility);
+
+    // Go!
+    loadData();
+    animate();
+  </script>
+</body>
+</html>

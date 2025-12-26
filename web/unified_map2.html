@@ -1,0 +1,1136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unified Guardian / Omphalos / Sky + Distortion (Lensing) Map</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
+    #ui {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 10; background: rgba(0,0,0,0.65);
+      padding: 10px 12px; font-size: 12px; border-radius: 8px;
+      width: 380px;
+      border: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+    }
+    #ui .row { margin-top: 8px; }
+    label { display: block; margin: 6px 0; user-select: none; }
+    input[type="range"] { width: 100%; }
+    select {
+      width: 100%;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 6px;
+      padding: 6px;
+    }
+    button {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 8px;
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+    button:hover { background: rgba(255,255,255,0.12); }
+    #status { opacity: 0.95; margin-top: 10px; white-space: pre-line; line-height: 1.25; }
+    #hint { opacity: 0.7; font-size: 11px; margin-top: 10px; line-height: 1.25; }
+    #corridorReadout {
+      margin-top: 8px;
+      padding: 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,0.10);
+      background: rgba(0,0,0,0.35);
+      white-space: pre-line;
+      line-height: 1.25;
+      font-size: 11px;
+      opacity: 0.92;
+      max-height: 160px;
+      overflow: auto;
+    }
+    #tooltip {
+      position: absolute;
+      z-index: 20;
+      pointer-events: none;
+      background: rgba(0,0,0,0.80);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 7px 9px;
+      font-size: 12px;
+      max-width: 520px;
+      display: none;
+      white-space: nowrap;
+    }
+    #tooltip .sub { opacity: 0.8; font-size: 11px; }
+    .muted { opacity: 0.75; }
+    .tiny { opacity: 0.7; font-size: 11px; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+    .pill { display:inline-block; padding: 2px 6px; border:1px solid rgba(255,255,255,0.12); border-radius: 999px; font-size: 11px; opacity: 0.85; }
+  </style>
+</head>
+
+<body>
+  <div id="ui">
+    <div><strong>Unified Map</strong> <span class="pill">Lensing Model (B)</span></div>
+
+    <label><input type="checkbox" id="toggleGuardian" checked /> Guardian Shell / Hotspots</label>
+    <label><input type="checkbox" id="toggleOmphalos" checked /> Omphalos / Raxxla Network</label>
+    <label><input type="checkbox" id="toggleSky" checked /> Sky Breadcrumbs (ED Anchors)</label>
+
+    <div class="row" style="border-top:1px solid rgba(255,255,255,0.08); padding-top:8px;">
+      <div><strong>Corridor Tube</strong></div>
+      <label><input type="checkbox" id="toggleCorridor" checked /> Show Corridor Tube</label>
+      <label><input type="checkbox" id="toggleInsideHighlight" checked /> Highlight Omphalos nodes inside corridor</label>
+
+      <div class="row">
+        <div class="tiny">Corridor vector (from Sky)</div>
+        <select id="corridorVector">
+          <option value="none" selected>(loading…)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Corridor length (ly)</div>
+        <input type="range" id="corridorLength" min="200" max="12000" step="100" value="1200" />
+        <div class="tiny">Length: <span id="corridorLengthLabel">1200</span> ly</div>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Corridor radius (ly)</div>
+        <input type="range" id="corridorRadius" min="10" max="600" step="5" value="90" />
+        <div class="tiny">Radius: <span id="corridorRadiusLabel">90</span> ly</div>
+      </div>
+
+      <div class="row grid">
+        <button id="rebuildCorridorBtn">Rebuild Corridor</button>
+        <button id="recalcInsideBtn">Recalc Inside Nodes</button>
+      </div>
+
+      <div id="corridorReadout" class="muted">Corridor readout…</div>
+    </div>
+
+    <div class="row" style="border-top:1px solid rgba(255,255,255,0.08); padding-top:8px;">
+      <div><strong>Distortion (Gravity Well)</strong></div>
+      <label><input type="checkbox" id="toggleDistortion" checked /> Show Distortion Well + Lensed Rays</label>
+
+      <div class="row tiny">Strength proxy (fast): <strong>Omphalos node degree</strong> (how connected a node is).</div>
+
+      <div class="row">
+        <div class="tiny">Well source</div>
+        <select id="wellMode">
+          <option value="centroid" selected>Centroid of strongest nodes (recommended)</option>
+          <option value="max">Single strongest node</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Use Sky direction as a “bias” (optional)</div>
+        <select id="biasVector">
+          <option value="none" selected>None (global well)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Top-strength percentile used for well (smaller = tighter well)</div>
+        <input type="range" id="topPercent" min="0.2" max="10" step="0.2" value="2.0" />
+        <div class="tiny"><span id="topPercentLabel">2.0%</span> of nodes</div>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Lensing strength (how much rays bend toward well)</div>
+        <input type="range" id="lensStrength" min="0" max="1" step="0.02" value="0.35" />
+        <div class="tiny">Strength: <span id="lensStrengthLabel">0.35</span></div>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Vector ray length (ly)</div>
+        <input type="range" id="rayLength" min="200" max="8000" step="100" value="1200" />
+        <div class="tiny">Length: <span id="rayLengthLabel">1200</span> ly</div>
+      </div>
+
+      <div class="row grid">
+        <button id="recomputeWellBtn">Recompute Well</button>
+        <button id="rebuildRaysBtn">Rebuild Lensed Rays</button>
+      </div>
+    </div>
+
+    <div id="status">Loading…</div>
+
+    <div id="hint">
+      B-model interpretation:
+      <br/>• “Distortion strength” = graph connectivity (degree) in Omphalos.
+      <br/>• “Well” = weighted center of the strongest region (or the single strongest node).
+      <br/>• “Lensed rays” = your breadcrumb vectors curved toward that well.
+      <br/><span class="muted">Open: http://localhost:8000/web/unified_map2.html — serve from project root: python -m http.server 8000</span>
+    </div>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    // ---- Paths that match YOUR repo ----
+    // Guardian is optional.
+    const PATHS = {
+      guardian: "../data/processed/guardian_map.json",
+      omphalos: "../data/processed/omphalos_map.json",
+      sky:      "../data/processed/sky_ed.json"
+    };
+
+    // ---------- DOM helpers ----------
+    const $ = (id) => document.getElementById(id);
+
+    const statusEl = $("status");
+    const toggleGuardian = $("toggleGuardian");
+    const toggleOmphalos = $("toggleOmphalos");
+    const toggleSky = $("toggleSky");
+    const tooltip = $("tooltip");
+
+    // Corridor UI
+    const toggleCorridor = $("toggleCorridor");
+    const toggleInsideHighlight = $("toggleInsideHighlight");
+    const corridorVector = $("corridorVector");
+    const corridorLength = $("corridorLength");
+    const corridorLengthLabel = $("corridorLengthLabel");
+    const corridorRadius = $("corridorRadius");
+    const corridorRadiusLabel = $("corridorRadiusLabel");
+    const rebuildCorridorBtn = $("rebuildCorridorBtn");
+    const recalcInsideBtn = $("recalcInsideBtn");
+    const corridorReadout = $("corridorReadout");
+
+    // Distortion UI
+    const toggleDistortion = $("toggleDistortion");
+    const wellMode = $("wellMode");
+    const biasVector = $("biasVector");
+    const topPercent = $("topPercent");
+    const topPercentLabel = $("topPercentLabel");
+    const lensStrength = $("lensStrength");
+    const lensStrengthLabel = $("lensStrengthLabel");
+    const rayLength = $("rayLength");
+    const rayLengthLabel = $("rayLengthLabel");
+    const recomputeWellBtn = $("recomputeWellBtn");
+    const rebuildRaysBtn = $("rebuildRaysBtn");
+
+    function setStatus(lines) {
+      const text = Array.isArray(lines) ? lines.join("\n") : String(lines ?? "");
+      if (statusEl) statusEl.textContent = text;
+      else console.warn("Status:", text);
+    }
+    function setCorridorReadout(lines) {
+      const text = Array.isArray(lines) ? lines.join("\n") : String(lines ?? "");
+      if (corridorReadout) corridorReadout.textContent = text;
+    }
+
+    function syncUiLabels() {
+      topPercentLabel.textContent = `${Number(topPercent.value).toFixed(1)}%`;
+      lensStrengthLabel.textContent = `${Number(lensStrength.value).toFixed(2)}`;
+      rayLengthLabel.textContent = `${Number(rayLength.value).toFixed(0)}`;
+
+      corridorLengthLabel.textContent = `${Number(corridorLength.value).toFixed(0)}`;
+      corridorRadiusLabel.textContent = `${Number(corridorRadius.value).toFixed(0)}`;
+    }
+
+    topPercent.addEventListener("input", syncUiLabels);
+    lensStrength.addEventListener("input", syncUiLabels);
+    rayLength.addEventListener("input", syncUiLabels);
+    corridorLength.addEventListener("input", syncUiLabels);
+    corridorRadius.addEventListener("input", syncUiLabels);
+    syncUiLabels();
+
+    // ---------- Three.js setup ----------
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 5000000);
+    camera.position.set(0, 0, 900);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.55));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.65);
+    dirLight.position.set(1, 1, 1);
+    scene.add(dirLight);
+
+    // Groups for layers
+    const guardianGroup = new THREE.Group();
+    const omphalosGroup = new THREE.Group();
+    const skyGroup = new THREE.Group();
+    const distortionGroup = new THREE.Group();
+    const corridorGroup = new THREE.Group();
+    scene.add(guardianGroup, omphalosGroup, skyGroup, distortionGroup, corridorGroup);
+
+    // ---------- Materials / Geometry ----------
+    const guardianNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const omphalosNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+    const omphalosInsideMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const centerMaterial       = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+    const skyConstMaterial     = new THREE.MeshBasicMaterial({ color: 0xff66cc });
+    const skyOriginMaterial    = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const skyVectorMaterial    = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+    const refMaterial          = new THREE.MeshBasicMaterial({ color: 0xaa66ff }); // reference nodes (Maia)
+
+    const guardianLineMaterial = new THREE.LineBasicMaterial({ color: 0x007700, transparent: true, opacity: 0.60 });
+    const omphalosLineMaterial = new THREE.LineBasicMaterial({ color: 0x4444ff, transparent: true, opacity: 0.65 });
+
+    const skyRayMaterial       = new THREE.LineBasicMaterial({ color: 0x666666, transparent: true, opacity: 0.45 });
+    const skyVectorLineMat     = new THREE.LineBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.85 });
+    const refRayMaterial       = new THREE.LineBasicMaterial({ color: 0xaa66ff, transparent: true, opacity: 0.75 });
+
+    const lensCurveMaterial    = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.85 });
+    const wellMaterial         = new THREE.MeshBasicMaterial({ color: 0xff66ff, transparent: true, opacity: 0.9 });
+    const wellWireMaterial     = new THREE.LineBasicMaterial({ color: 0xff66ff, transparent: true, opacity: 0.25 });
+
+    // Corridor visuals
+    const corridorMaterial = new THREE.MeshBasicMaterial({
+      color: 0xffaa00,
+      transparent: true,
+      opacity: 0.12,
+      side: THREE.DoubleSide
+    });
+    const corridorWireMaterial = new THREE.LineBasicMaterial({
+      color: 0xffaa00,
+      transparent: true,
+      opacity: 0.35
+    });
+
+    const nodeGeometry         = new THREE.SphereGeometry(2, 12, 12);
+    const skyNodeGeometry      = new THREE.SphereGeometry(4, 14, 14);
+    const skyOriginGeometry    = new THREE.SphereGeometry(6, 16, 16);
+    const wellGeometry         = new THREE.SphereGeometry(10, 18, 14);
+
+    // ---------- Utilities ----------
+    async function loadJSON(url) {
+      const r = await fetch(url);
+      if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+      return r.json();
+    }
+
+    function clearGroup(group) {
+      const kill = [];
+      group.traverse(o => kill.push(o));
+      for (const o of kill) {
+        if (o.geometry) o.geometry.dispose?.();
+        if (o.material) {
+          if (Array.isArray(o.material)) o.material.forEach(m => m.dispose?.());
+          else o.material.dispose?.();
+        }
+      }
+      while (group.children.length) group.remove(group.children[0]);
+    }
+
+    function toViewerVec3(pMath) {
+      // viewer mapping is (x, z, y)
+      return new THREE.Vector3(pMath.x, pMath.z, pMath.y);
+    }
+
+    function addLayer(group, data, layerName) {
+      const nodes = data.nodes || [];
+      const links = data.links || [];
+      const centerName = (data.meta && data.meta.center) ? data.meta.center : null;
+
+      const nodeIndex = {};
+      nodes.forEach(n => { nodeIndex[n.id] = n; });
+
+      // Nodes
+      nodes.forEach(n => {
+        let mesh = null;
+
+        if (layerName === "guardian" || layerName === "omphalos") {
+          const geom = nodeGeometry.clone();
+          let mat = (layerName === "guardian") ? guardianNodeMaterial : omphalosNodeMaterial;
+          if (centerName && n.id === centerName) mat = centerMaterial;
+
+          mesh = new THREE.Mesh(geom, mat);
+          mesh.userData.__baseMat = mat;
+          mesh.userData.__baseScale = 1.0;
+        } else if (layerName === "sky") {
+          if (n.type === "origin") {
+            mesh = new THREE.Mesh(skyOriginGeometry, skyOriginMaterial);
+          } else if (n.type === "vector") {
+            const cone = new THREE.ConeGeometry(7, 18, 16);
+            mesh = new THREE.Mesh(cone, skyVectorMaterial);
+            mesh.lookAt(0, 0, 0);
+          } else if (n.type === "reference") {
+            mesh = new THREE.Mesh(skyNodeGeometry, refMaterial);
+          } else {
+            mesh = new THREE.Mesh(skyNodeGeometry, skyConstMaterial);
+          }
+        }
+
+        if (!mesh) return;
+
+        mesh.position.set(n.x || 0, n.z || 0, n.y || 0);
+        mesh.userData = { ...mesh.userData, ...n, __layer: layerName };
+        group.add(mesh);
+
+        if (layerName === "sky" && n.type === "vector") {
+          const outward = mesh.position.clone().normalize();
+          const target = outward.clone().multiplyScalar(1000);
+          mesh.lookAt(target);
+        }
+      });
+
+      // Links
+      links.forEach(l => {
+        const a = nodeIndex[l.source];
+        const b = nodeIndex[l.target];
+        if (!a || !b) return;
+
+        const points = [
+          new THREE.Vector3(a.x || 0, a.z || 0, a.y || 0),
+          new THREE.Vector3(b.x || 0, b.z || 0, b.y || 0)
+        ];
+
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+
+        let mat = null;
+        if (layerName === "guardian") mat = guardianLineMaterial;
+        else if (layerName === "omphalos") mat = omphalosLineMaterial;
+        else if (layerName === "sky") {
+          if (l.kind === "vector") mat = skyVectorLineMat;
+          else if (l.kind === "reference_ray") mat = refRayMaterial;
+          else mat = skyRayMaterial;
+        }
+
+        const line = new THREE.Line(geometry, mat);
+        line.userData = { __layer: layerName, __isLine: true, ...l };
+        group.add(line);
+      });
+    }
+
+    // ---------- Data state ----------
+    let omphalosData = null;
+    let skyData = null;
+
+    // Omphalos indexing
+    let omIdToIndex = null;     // Map<string, number>
+    let omPos = null;           // Array<Vector3> in math coords (x,y,z)
+    let omDegree = null;        // Uint32Array
+    let omStrength = null;      // Float32Array normalized 0..1
+    let omMeshById = new Map(); // id -> Mesh (for highlighting)
+
+    // Computed well
+    let well = {
+      enabled: true,
+      position: new THREE.Vector3(0,0,0),
+      strength: 0,
+      mode: "centroid",
+      topPercent: 2.0,
+      bias: "none",
+    };
+
+    // Distortion visuals
+    let wellMesh = null;
+    let wellWire = null;
+    let lensedRays = []; // lines
+
+    // Sky vector registry
+    const skyVectors = new Map();  // name -> {id,label, vec(Vector3), constellation}
+    const skyRefs = new Map();     // id -> {id,label,pos, role}
+
+    // Corridor state
+    let corridor = {
+      name: "none",
+      dir: new THREE.Vector3(1,0,0),
+      length: 1200,
+      radius: 90,
+      insideIdx: [],
+      insideSet: new Set(),
+    };
+    let corridorMesh = null;
+    let corridorWire = null;
+
+    // ---------- Distortion math ----------
+    function buildOmphalosIndexAndDegree() {
+      if (!omphalosData) return;
+
+      const nodes = omphalosData.nodes || [];
+      const links = omphalosData.links || [];
+
+      omIdToIndex = new Map();
+      omPos = new Array(nodes.length);
+      omDegree = new Uint32Array(nodes.length);
+
+      for (let i = 0; i < nodes.length; i++) {
+        const n = nodes[i];
+        omIdToIndex.set(n.id, i);
+        omPos[i] = new THREE.Vector3(n.x || 0, n.y || 0, n.z || 0);
+      }
+
+      for (const e of links) {
+        const ia = omIdToIndex.get(e.source);
+        const ib = omIdToIndex.get(e.target);
+        if (ia === undefined || ib === undefined) continue;
+        omDegree[ia] += 1;
+        omDegree[ib] += 1;
+      }
+
+      // Strength proxy: log(1+deg) normalized to 0..1
+      let minV = Infinity, maxV = -Infinity;
+      const tmp = new Float32Array(nodes.length);
+      for (let i = 0; i < nodes.length; i++) {
+        const v = Math.log1p(omDegree[i]);
+        tmp[i] = v;
+        if (v < minV) minV = v;
+        if (v > maxV) maxV = v;
+      }
+      const span = Math.max(1e-9, maxV - minV);
+      omStrength = new Float32Array(nodes.length);
+      for (let i = 0; i < nodes.length; i++) {
+        omStrength[i] = (tmp[i] - minV) / span;
+      }
+    }
+
+    function indexOmphalosMeshes() {
+      omMeshById = new Map();
+      omphalosGroup.traverse(o => {
+        if (o && o.isMesh && o.userData && o.userData.__layer === "omphalos" && o.userData.id) {
+          omMeshById.set(o.userData.id, o);
+        }
+      });
+    }
+
+    function getSkyVectorOptions(selectEl, includeNone=true) {
+      if (!selectEl) return;
+      while (selectEl.options.length) selectEl.remove(0);
+      if (includeNone) {
+        const opt0 = document.createElement("option");
+        opt0.value = "none";
+        opt0.textContent = "None";
+        selectEl.appendChild(opt0);
+      }
+      const keys = Array.from(skyVectors.keys()).sort();
+      for (const k of keys) {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = k;
+        selectEl.appendChild(opt);
+      }
+    }
+
+    function getVectorDirByName(name) {
+      if (!name || name === "none") return null;
+      const rec = skyVectors.get(name);
+      if (!rec) return null;
+      const v = rec.vec.clone();
+      if (v.lengthSq() < 1e-12) return null;
+      return v.normalize();
+    }
+
+    function computeWellCentroid(topPct, biasName) {
+      if (!omStrength || !omPos) return { pos: new THREE.Vector3(0,0,0), strength: 0, used: 0 };
+
+      const N = omStrength.length;
+      const pct = Math.min(50, Math.max(0.05, topPct));
+      const k = Math.max(10, Math.floor((pct / 100) * N));
+
+      const arr = new Float32Array(omStrength);
+      const sortable = Array.from(arr);
+      sortable.sort((a,b) => b - a);
+      const thresh = sortable[Math.min(k-1, sortable.length-1)];
+
+      const biasDir = getVectorDirByName(biasName);
+
+      let sx=0, sy=0, sz=0;
+      let sw=0;
+      let used=0;
+      let bestS=0;
+
+      for (let i = 0; i < N; i++) {
+        const s = omStrength[i];
+        if (s < thresh) continue;
+
+        let w = s * s;
+
+        if (biasDir) {
+          const u = omPos[i].clone().normalize();
+          const cos = u.dot(biasDir);
+          if (cos <= 0) continue;
+          const a = Math.pow(cos, 4);
+          w *= a;
+        }
+
+        if (w <= 1e-12) continue;
+
+        sx += omPos[i].x * w;
+        sy += omPos[i].y * w;
+        sz += omPos[i].z * w;
+        sw += w;
+        used += 1;
+        if (s > bestS) bestS = s;
+      }
+
+      if (sw <= 1e-12 || used < 5) {
+        return { pos: new THREE.Vector3(0,0,0), strength: 0, used };
+      }
+      return { pos: new THREE.Vector3(sx/sw, sy/sw, sz/sw), strength: bestS, used };
+    }
+
+    function computeWellMaxNode(biasName) {
+      if (!omStrength || !omPos) return { pos: new THREE.Vector3(0,0,0), strength: 0, idx: -1 };
+
+      const biasDir = getVectorDirByName(biasName);
+
+      let best = -1;
+      let bestVal = -Infinity;
+
+      for (let i = 0; i < omStrength.length; i++) {
+        let s = omStrength[i];
+
+        if (biasDir) {
+          const u = omPos[i].clone().normalize();
+          const cos = u.dot(biasDir);
+          if (cos <= 0) continue;
+          s = s * Math.pow(cos, 4);
+        }
+
+        if (s > bestVal) {
+          bestVal = s;
+          best = i;
+        }
+      }
+
+      if (best < 0) return { pos: new THREE.Vector3(0,0,0), strength: 0, idx: -1 };
+      return { pos: omPos[best].clone(), strength: bestVal, idx: best };
+    }
+
+    // ---------- Distortion visuals ----------
+    function addOrUpdateWellVisual() {
+      if (wellMesh) distortionGroup.remove(wellMesh);
+      if (wellWire) distortionGroup.remove(wellWire);
+      wellMesh = null;
+      wellWire = null;
+
+      const p = well.position;
+      wellMesh = new THREE.Mesh(wellGeometry, wellMaterial);
+      wellMesh.position.set(p.x, p.z, p.y);
+      wellMesh.userData = {
+        __layer: "distortion",
+        id: "DISTORTION_WELL",
+        label: "Distortion Well",
+        role: "analysis:gravity_well",
+        x: p.x, y: p.y, z: p.z,
+        strength: well.strength,
+        mode: well.mode,
+        bias: well.bias,
+      };
+      distortionGroup.add(wellMesh);
+
+      const r = 60 + 240 * Number(lensStrength.value);
+      const sphereGeo = new THREE.SphereGeometry(r, 24, 18);
+      const wire = new THREE.WireframeGeometry(sphereGeo);
+      wellWire = new THREE.LineSegments(wire, wellWireMaterial);
+      wellWire.position.copy(wellMesh.position);
+      distortionGroup.add(wellWire);
+    }
+
+    function makeCurveLine(start, end, wellPos, strength01, segments=64) {
+      const mid = start.clone().add(end).multiplyScalar(0.5);
+      const control = mid.clone().add(wellPos.clone().sub(mid).multiplyScalar(strength01));
+      const curve = new THREE.QuadraticBezierCurve3(start, control, end);
+      const pts = curve.getPoints(segments);
+      const vpts = pts.map(p => new THREE.Vector3(p.x, p.z, p.y));
+      const geo = new THREE.BufferGeometry().setFromPoints(vpts);
+      return new THREE.Line(geo, lensCurveMaterial);
+    }
+
+    function rebuildLensedRays() {
+      for (const l of lensedRays) {
+        distortionGroup.remove(l);
+        l.geometry?.dispose?.();
+      }
+      lensedRays = [];
+
+      if (!toggleDistortion.checked) return;
+      if (!skyData) return;
+
+      const sol = new THREE.Vector3(0,0,0);
+      const wellPos = well.position.clone();
+      const bend = Number(lensStrength.value);
+      const len = Number(rayLength.value);
+
+      for (const [name, rec] of skyVectors.entries()) {
+        const dir = rec.vec.clone().normalize();
+        if (dir.lengthSq() < 1e-12) continue;
+
+        const end = dir.multiplyScalar(len);
+
+        const line = makeCurveLine(sol, end, wellPos, bend, 72);
+        line.userData = {
+          __layer: "distortion",
+          id: `LENSED_${rec.id}`,
+          label: `Lensed Ray: ${name}`,
+          role: "analysis:lensed_ray",
+          source: "Sol",
+          target: rec.id,
+          vector_length_ly: len,
+          lens_strength: bend,
+          bias: well.bias,
+        };
+        distortionGroup.add(line);
+        lensedRays.push(line);
+      }
+
+      for (const [id, r] of skyRefs.entries()) {
+        const end = r.pos.clone();
+        if (end.lengthSq() < 1e-12) continue;
+
+        const line = makeCurveLine(sol, end, wellPos, bend, 72);
+        line.material = refRayMaterial.clone();
+        line.userData = {
+          __layer: "distortion",
+          id: `LENSED_REF_${id}`,
+          label: `Lensed Ref: ${r.label}`,
+          role: "analysis:lensed_reference",
+          source: "Sol",
+          target: id,
+          lens_strength: bend,
+        };
+        distortionGroup.add(line);
+        lensedRays.push(line);
+      }
+    }
+
+    function recomputeWell() {
+      if (!omphalosData || !omStrength) return;
+
+      well.mode = wellMode.value;
+      well.topPercent = Number(topPercent.value);
+      well.bias = biasVector.value;
+
+      let res;
+      if (well.mode === "max") {
+        res = computeWellMaxNode(well.bias);
+        well.position.copy(res.pos);
+        well.strength = res.strength;
+      } else {
+        res = computeWellCentroid(well.topPercent, well.bias);
+        well.position.copy(res.pos);
+        well.strength = res.strength;
+      }
+
+      addOrUpdateWellVisual();
+      rebuildLensedRays();
+    }
+
+    // ---------- Corridor math + visuals ----------
+    function rebuildCorridorTube() {
+      clearGroup(corridorGroup);
+      corridorMesh = null;
+      corridorWire = null;
+
+      if (!toggleCorridor.checked) {
+        setCorridorReadout("Corridor: off");
+        return;
+      }
+
+      const name = corridorVector.value;
+      const dir = getVectorDirByName(name);
+      if (!dir) {
+        setCorridorReadout("Corridor: select a vector");
+        return;
+      }
+
+      corridor.name = name;
+      corridor.dir = dir.clone();
+      corridor.length = Number(corridorLength.value);
+      corridor.radius = Number(corridorRadius.value);
+
+      // Cylinder in viewer coords
+      // Cylinder geometry is along Y axis; we rotate it to align with direction (in viewer coords).
+      const len = corridor.length;
+      const rad = corridor.radius;
+
+      const cylGeo = new THREE.CylinderGeometry(rad, rad, len, 28, 1, true);
+      corridorMesh = new THREE.Mesh(cylGeo, corridorMaterial);
+
+      // Direction in viewer coords
+      const dView = new THREE.Vector3(dir.x, dir.z, dir.y).normalize();
+      const yAxis = new THREE.Vector3(0, 1, 0);
+
+      const q = new THREE.Quaternion().setFromUnitVectors(yAxis, dView);
+      corridorMesh.quaternion.copy(q);
+
+      // Position centered at half-length from origin
+      const centerMath = dir.clone().multiplyScalar(len * 0.5);
+      const centerView = new THREE.Vector3(centerMath.x, centerMath.z, centerMath.y);
+      corridorMesh.position.copy(centerView);
+
+      corridorMesh.userData = {
+        __layer: "corridor",
+        id: `CORRIDOR_${name}`,
+        label: `Corridor: ${name}`,
+        role: "analysis:corridor_tube",
+        radius_ly: rad,
+        length_ly: len
+      };
+
+      corridorGroup.add(corridorMesh);
+
+      // Wireframe cylinder
+      const wire = new THREE.WireframeGeometry(cylGeo);
+      corridorWire = new THREE.LineSegments(wire, corridorWireMaterial);
+      corridorWire.quaternion.copy(corridorMesh.quaternion);
+      corridorWire.position.copy(corridorMesh.position);
+      corridorGroup.add(corridorWire);
+
+      // Also recalc inside if enabled
+      recalcInsideNodes();
+    }
+
+    function recalcInsideNodes() {
+      corridor.insideIdx = [];
+      corridor.insideSet = new Set();
+
+      if (!toggleCorridor.checked) return;
+      const dir = corridor.dir;
+      if (!dir || dir.lengthSq() < 1e-12) return;
+
+      if (!omPos || !omStrength) {
+        setCorridorReadout("Corridor: waiting for Omphalos…");
+        return;
+      }
+
+      const len = corridor.length;
+      const r = corridor.radius;
+      const r2 = r * r;
+
+      for (let i = 0; i < omPos.length; i++) {
+        const p = omPos[i]; // math coords
+        const t = p.dot(dir);           // projection length along corridor axis
+        if (t < 0 || t > len) continue;
+        const closest = dir.clone().multiplyScalar(t);
+        const d2 = p.clone().sub(closest).lengthSq();
+        if (d2 <= r2) {
+          corridor.insideIdx.push(i);
+          corridor.insideSet.add(i);
+        }
+      }
+
+      applyInsideHighlight();
+      updateCorridorReadout();
+    }
+
+    let lastHighlightedIds = new Set();
+
+    function clearInsideHighlight() {
+      for (const id of lastHighlightedIds) {
+        const mesh = omMeshById.get(id);
+        if (!mesh) continue;
+        mesh.material = mesh.userData.__baseMat || omphalosNodeMaterial;
+        mesh.scale.setScalar(mesh.userData.__baseScale || 1.0);
+        mesh.userData.__inside = false;
+      }
+      lastHighlightedIds = new Set();
+    }
+
+    function applyInsideHighlight() {
+      if (!toggleInsideHighlight.checked) {
+        clearInsideHighlight();
+        return;
+      }
+      if (!omphalosData) return;
+
+      clearInsideHighlight();
+
+      const nodes = omphalosData.nodes || [];
+      for (const i of corridor.insideIdx) {
+        const n = nodes[i];
+        if (!n || !n.id) continue;
+        const mesh = omMeshById.get(n.id);
+        if (!mesh) continue;
+
+        mesh.material = omphalosInsideMaterial;
+        mesh.scale.setScalar(2.25);
+        mesh.userData.__inside = true;
+
+        lastHighlightedIds.add(n.id);
+      }
+    }
+
+    function updateCorridorReadout() {
+      if (!omphalosData || !omStrength || !omDegree) {
+        setCorridorReadout("Corridor readout: waiting for Omphalos…");
+        return;
+      }
+
+      const nodes = omphalosData.nodes || [];
+      const count = corridor.insideIdx.length;
+
+      // Top K inside by strength (then degree)
+      const K = 12;
+      const scored = corridor.insideIdx.map(i => ({
+        i,
+        s: omStrength[i],
+        d: omDegree[i]
+      }));
+      scored.sort((a,b) => (b.s - a.s) || (b.d - a.d));
+
+      const top = scored.slice(0, K).map((r, rank) => {
+        const n = nodes[r.i];
+        const name = (n && n.id) ? n.id : `idx:${r.i}`;
+        return `${String(rank+1).padStart(2," ")}. ${name}  strength=${r.s.toFixed(3)}  deg=${r.d}`;
+      });
+
+      setCorridorReadout([
+        `Corridor: ${corridor.name}`,
+        `Length: ${corridor.length.toFixed(0)} ly   Radius: ${corridor.radius.toFixed(0)} ly`,
+        `Inside Omphalos nodes: ${count}`,
+        "",
+        "Top inside (strength proxy):",
+        ...(top.length ? top : ["(none)"])
+      ]);
+    }
+
+    // ---------- Toggles ----------
+    toggleGuardian?.addEventListener("change", () => { guardianGroup.visible = !!toggleGuardian.checked; });
+    toggleOmphalos?.addEventListener("change", () => { omphalosGroup.visible = !!toggleOmphalos.checked; });
+    toggleSky?.addEventListener("change", () => { skyGroup.visible = !!toggleSky.checked; });
+
+    toggleDistortion?.addEventListener("change", () => {
+      distortionGroup.visible = !!toggleDistortion.checked;
+      if (toggleDistortion.checked) recomputeWell();
+    });
+
+    toggleCorridor?.addEventListener("change", () => {
+      corridorGroup.visible = !!toggleCorridor.checked;
+      rebuildCorridorTube();
+    });
+
+    toggleInsideHighlight?.addEventListener("change", () => {
+      applyInsideHighlight();
+      updateCorridorReadout();
+    });
+
+    // Corridor controls
+    rebuildCorridorBtn?.addEventListener("click", () => rebuildCorridorTube());
+    recalcInsideBtn?.addEventListener("click", () => recalcInsideNodes());
+    corridorVector?.addEventListener("change", () => {
+      // Convenience: align distortion bias to the same vector if present in bias selector
+      // (doesn't force it, but helps “connect the dots”)
+      const v = corridorVector.value;
+      if (v && v !== "none") {
+        // If biasVector has that option, set it.
+        for (const opt of biasVector.options) {
+          if (opt.value === v) {
+            biasVector.value = v;
+            break;
+          }
+        }
+      }
+      rebuildCorridorTube();
+      recomputeWell();
+    });
+    corridorLength?.addEventListener("change", () => rebuildCorridorTube());
+    corridorRadius?.addEventListener("change", () => rebuildCorridorTube());
+
+    // Distortion controls
+    recomputeWellBtn?.addEventListener("click", () => recomputeWell());
+    rebuildRaysBtn?.addEventListener("click", () => rebuildLensedRays());
+    biasVector?.addEventListener("change", () => recomputeWell());
+    wellMode?.addEventListener("change", () => recomputeWell());
+    topPercent?.addEventListener("change", () => recomputeWell());
+    lensStrength?.addEventListener("change", () => rebuildLensedRays());
+    rayLength?.addEventListener("change", () => rebuildLensedRays());
+
+    // ---------- Tooltip hover ----------
+    const raycaster = new THREE.Raycaster();
+    const mouse = new THREE.Vector2();
+    let lastHover = null;
+
+    function hideTooltip() {
+      if (!tooltip) return;
+      tooltip.style.display = "none";
+      lastHover = null;
+    }
+
+    function showTooltip(obj, clientX, clientY) {
+      if (!tooltip) return;
+      if (!obj) return hideTooltip();
+
+      const d = obj.userData || {};
+      const title = d.label || d.id || "Object";
+      const role = d.role ? `Role: ${d.role}` : "";
+      const layer = d.__layer ? `Layer: ${d.__layer}` : "";
+
+      let extra = "";
+      if (d.__layer === "distortion" && d.id === "DISTORTION_WELL") {
+        const s = (typeof d.strength === "number") ? d.strength.toFixed(3) : "?";
+        extra = `Strength: ${s} • Mode: ${d.mode} • Bias: ${d.bias}`;
+      }
+      if (d.__layer === "omphalos" && d.__inside) {
+        extra = (extra ? (extra + " • ") : "") + "Inside corridor: YES";
+      }
+      if (d.__layer === "corridor") {
+        extra = `Radius: ${Number(d.radius_ly).toFixed(0)} ly • Length: ${Number(d.length_ly).toFixed(0)} ly`;
+      }
+
+      tooltip.innerHTML = `
+        <div><strong>${title}</strong></div>
+        <div class="sub">${[role, layer].filter(Boolean).join(" • ")}</div>
+        ${extra ? `<div class="sub">${extra}</div>` : ""}
+      `;
+
+      tooltip.style.left = (clientX + 12) + "px";
+      tooltip.style.top = (clientY + 12) + "px";
+      tooltip.style.display = "block";
+      lastHover = obj;
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      if (!tooltip) return;
+
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+
+      const meshes = [];
+      if (guardianGroup.visible) guardianGroup.traverse(o => { if (o.isMesh) meshes.push(o); });
+      if (omphalosGroup.visible) omphalosGroup.traverse(o => { if (o.isMesh) meshes.push(o); });
+      if (skyGroup.visible) skyGroup.traverse(o => { if (o.isMesh) meshes.push(o); });
+      if (distortionGroup.visible) distortionGroup.traverse(o => { if (o.isMesh) meshes.push(o); });
+      if (corridorGroup.visible) corridorGroup.traverse(o => { if (o.isMesh) meshes.push(o); });
+
+      const hits = raycaster.intersectObjects(meshes, false);
+      if (!hits.length) return hideTooltip();
+
+      const hit = hits[0].object;
+      if (hit !== lastHover) showTooltip(hit, e.clientX, e.clientY);
+      else {
+        tooltip.style.left = (e.clientX + 12) + "px";
+        tooltip.style.top = (e.clientY + 12) + "px";
+      }
+    });
+
+    window.addEventListener("mouseleave", () => hideTooltip());
+
+    // ---------- Boot / Load ----------
+    async function boot() {
+      setStatus("Loading JSON…");
+      setCorridorReadout("Corridor readout: loading…");
+
+      const lines = [];
+
+      // Guardian optional
+      try {
+        const guardianData = await loadJSON(PATHS.guardian);
+        addLayer(guardianGroup, guardianData, "guardian");
+        lines.push(`Guardian: ${guardianData.nodes?.length || 0} nodes`);
+      } catch {
+        guardianGroup.visible = false;
+        if (toggleGuardian) toggleGuardian.checked = false;
+        lines.push(`Guardian: (missing) ${PATHS.guardian}`);
+      }
+
+      // Omphalos required
+      omphalosData = await loadJSON(PATHS.omphalos);
+      addLayer(omphalosGroup, omphalosData, "omphalos");
+      lines.push(`Omphalos: ${omphalosData.nodes?.length || 0} nodes, ${omphalosData.links?.length || 0} links`);
+
+      setStatus([...lines, "", "Computing distortion strength (node degree)…"]);
+      buildOmphalosIndexAndDegree();
+      indexOmphalosMeshes();
+
+      // Sky required
+      skyData = await loadJSON(PATHS.sky);
+      addLayer(skyGroup, skyData, "sky");
+      lines.push(`Sky: ${skyData.nodes?.length || 0} nodes, ${skyData.links?.length || 0} links`);
+
+      // Collect sky vectors + references
+      skyVectors.clear();
+      skyRefs.clear();
+
+      const sNodes = skyData.nodes || [];
+      for (const n of sNodes) {
+        if (n.type === "vector") {
+          const v = new THREE.Vector3(n.x || 0, n.y || 0, n.z || 0);
+          if (v.lengthSq() > 1e-12) {
+            const name = (n.constellation_label || n.constellation || n.label || n.id || "Vector");
+            skyVectors.set(name, { id: n.id, label: n.label || name, vec: v.clone(), constellation: n.constellation || name });
+          }
+        } else if (n.type === "reference") {
+          const p = new THREE.Vector3(n.x || 0, n.y || 0, n.z || 0);
+          skyRefs.set(n.id, { id: n.id, label: n.label || n.id, pos: p, role: n.role || "reference" });
+        }
+      }
+
+      // Fill selects: bias + corridor
+      getSkyVectorOptions(biasVector, true);
+      getSkyVectorOptions(corridorVector, false); // no "none" so user picks a vector
+      // Default corridor selection: first available vector
+      if (corridorVector.options.length) {
+        corridorVector.value = corridorVector.options[0].value;
+      }
+
+      // Distortion boot
+      distortionGroup.visible = !!toggleDistortion.checked;
+      if (toggleDistortion.checked) {
+        recomputeWell();
+      }
+
+      // Corridor boot
+      corridorGroup.visible = !!toggleCorridor.checked;
+      rebuildCorridorTube();
+
+      setStatus(lines);
+    }
+
+    boot().catch(err => {
+      console.error(err);
+      setStatus([
+        "Error loading JSON. Open DevTools Console.",
+        "",
+        "Common causes:",
+        "- Wrong fetch paths (check PATHS at top)",
+        "- Serving from wrong folder (serve from project root)",
+        "- Missing sky file (run build_sky_ed_layer.py)",
+        "- Cache (Ctrl+Shift+R)"
+      ]);
+      setCorridorReadout("Corridor readout: error (see console)");
+    });
+
+    // ---------- Render loop ----------
+    let t = 0;
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+
+      // subtle pulsing wire bubble
+      t += 0.01;
+      if (wellWire) {
+        const s = 1.0 + 0.03 * Math.sin(t * 1.4);
+        wellWire.scale.set(s,s,s);
+      }
+
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

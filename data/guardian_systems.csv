@@ -1,0 +1,2 @@
+name,x,y,z,category,region,faction,notes
+Guardian_Shell_Center,0,0,0,"guardian_shell","Guardian_Shell",,"Default Guardian shell center; you may overwrite or extend this row with your own data."

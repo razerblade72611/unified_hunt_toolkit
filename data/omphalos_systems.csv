@@ -1,0 +1,10 @@
+name,x,y,z,category,region,faction,notes
+Polaris,-322.6875,194.59375,-212.4375,permit_locked,Frontier_Legacy,,Classic Thargoid staging / transport lore. Fill coords.
+Shinrarta Dezhra,55.71875,17.59375,27.15625,lore_hub,Core,The Dark Wheel,Jameson Memorial hub. Permit-locked
+LFT 509,36.625,-1.8125,-38.3125,permit_locked,Bubble Fringe,,Dark Wheel hideout candidate (8th moon).
+Col 285 Sector BG-O d6-93,45.78125,-83.84375,161.90625,anomaly,Col 285,,Delta 69 phantom mass.
+Nefertem,38.125,30.875,-21.25,ghost_ship,Bubble Fringe,,Generation Ship Thetis ghost signal.
+Syreadiae JX-F c0,-9529.4375,-64.5,-7428.4375,megaship,Formidine Rift,,Zurara / Project Dynasty.
+HIP 22460,-41.3125,-58.96875,-354.78125,battlefield,Pleiades Fringe,,Proteus Wave. Permit-locked
+HIP 87621,-220.34375,112.125,328.71875,permit_locked,Bubble Fringe,October Consortium,Terri Tora mystery.
+Sol,0.0,0.0,0.0,reference,Core,Humanity,Origin reference.

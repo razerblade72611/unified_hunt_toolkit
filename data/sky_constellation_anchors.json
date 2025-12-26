@@ -1,0 +1,178 @@
+{
+  "meta": {
+    "schema_version": 2,
+    "center": "Sol",
+    "vector_length_ly_default": 1200,
+    "min_anchors_to_form_vector": 2,
+    "normalize_vectors": true,
+    "notes": [
+      "This file defines ED-anchored proxies for 'sky' constellations.",
+      "Each constellation points to one or more anchor groups; anchors must be resolvable ED system names in your local catalogs.",
+      "The builder will compute: vector = mean( normalize(anchor_xyz - Sol) * weight ) then scale to vector_length_ly."
+    ],
+    "recommended_workflow": [
+      "1) Run builder.",
+      "2) Review the output list of missed systems.",
+      "3) Replace missed names with systems that exist in your catalog (omphalos_systems.csv is best).",
+      "4) Re-run builder until each constellation has at least min_anchors_to_form_vector resolved anchors."
+    ],
+    "render_hints": {
+      "show_anchor_rays": true,
+      "show_vector_rays": true,
+      "show_anchor_nodes": true,
+      "show_vector_nodes": true
+    }
+  },
+
+  "references": [
+    {
+      "id": "Maia",
+      "label": "Maia (Pleiades) — Black Hole reference",
+      "system": "Maia",
+      "type": "reference",
+      "role": "reference:blackhole",
+      "links": [
+        { "target": "Sol", "kind": "reference_ray", "label": "Sol → Maia" }
+      ]
+    }
+  ],
+
+  "constellations": [
+    {
+      "name": "Cassiopeia",
+      "label": "Vain Queen",
+      "intent": "Directional proxy toward Formidine Rift-facing sky based on Cassiopeia region anchors (catalog-resolvable).",
+      "vector_length_ly": 1200,
+      "anchor_groups": [
+        {
+          "group": "core",
+          "description": "Catalog-resolvable Cassiopeia proxies (preferred).",
+          "anchors": [
+            { "system": "Schedar", "weight": 1.0, "note": "Alpha Cas common-name proxy (resolves in your catalog)" },
+            { "system": "Caph", "weight": 1.0, "note": "Beta Cas common-name proxy (resolves in your catalog)" },
+            { "system": "Ruchbah", "weight": 0.9, "note": "Delta Cas common-name proxy (resolves in your catalog)" },
+            { "system": "Segin", "weight": 0.8, "note": "Epsilon Cas common-name proxy (resolves in your catalog)" },
+            { "system": "27 Gamma Cassiopeiae", "weight": 0.9, "note": "Exact catalog match for Gamma Cas (your search output showed this)" }
+          ]
+        },
+        {
+          "group": "extended",
+          "description": "Optional extra Cassiopeia anchors (resolvable) to stabilize the vector.",
+          "anchors": [
+            { "system": "Zeta Cassiopeiae", "weight": 0.6, "note": "Resolves in your catalog (per your find_system_names output)" },
+            { "system": "Eta Cassiopeiae", "weight": 0.6, "note": "Resolves in your catalog (per your find_system_names output)" },
+            { "system": "Kappa Cassiopeiae", "weight": 0.5, "note": "Resolves in your catalog (per your find_system_names output)" }
+          ]
+        },
+        {
+          "group": "avoid_core_far",
+          "description": "Known-resolving but potentially misleading due to extreme distance in your catalog; keep OUT of core.",
+          "anchors": [
+            { "system": "Rho Cassiopeiae", "weight": 0.2, "note": "Resolved ~11k ly in your run; keep only as a diagnostic/fallback" }
+          ]
+        }
+      ],
+      "breadcrumbs": {
+        "myth_label": "Vain Queen",
+        "riddle_mapping": "Vain Queen → Cassiopeia",
+        "notes": [
+          "If this is meant to indicate a corridor toward the Rift, focus on *direction*, not distance.",
+          "Use the resulting vector as a search axis for candidate shells or low-coverage volumes."
+        ]
+      },
+      "render_hints": {
+        "anchor_color": 16737996,
+        "vector_color": 16750848,
+        "anchor_size": 4,
+        "vector_size": 8
+      }
+    },
+
+    {
+      "name": "Camelopardalis",
+      "label": "Giraffe",
+      "intent": "Directional proxy toward Camelopardalis region anchors (catalog-resolvable).",
+      "vector_length_ly": 1200,
+      "anchor_groups": [
+        {
+          "group": "core",
+          "description": "Catalog-resolvable Camelopardalis anchors. Use numbered variants that your catalog actually contains.",
+          "anchors": [
+            { "system": "9 Alpha Camelopardalis", "weight": 1.0, "note": "Exact catalog match (your find_system_names output showed this)" },
+            { "system": "10 Beta Camelopardalis", "weight": 1.0, "note": "Exact catalog match (your find_system_names output showed this)" },
+            { "system": "CS Camelopardalis", "weight": 0.8, "note": "Already resolved in your build output" },
+            { "system": "Gamma Camelopardalis", "weight": 0.6, "note": "Shown in your find_system_names output" }
+          ]
+        },
+        {
+          "group": "extended",
+          "description": "Extra Camelopardalis anchors (resolvable) to improve stability.",
+          "anchors": [
+            { "system": "43 Camelopardalis", "weight": 0.5, "note": "Shown in your find_system_names output" },
+            { "system": "16 Camelopardalis", "weight": 0.5, "note": "Shown in your find_system_names output" },
+            { "system": "H Camelopardalis", "weight": 0.4, "note": "Shown in your find_system_names output" },
+            { "system": "HR 2209", "weight": 0.4, "note": "Already resolved in your build output; keep as additional anchor" }
+          ]
+        }
+      ],
+      "breadcrumbs": {
+        "myth_label": "Giraffe",
+        "riddle_mapping": "Giraffe → Camelopardalis",
+        "notes": [
+          "Camelopardalis naming varies; numbered/lettered variants are common in ED catalogs.",
+          "After each run, keep anchors that resolve and remove anchors that collide to wildly different distances/directions."
+        ]
+      },
+      "render_hints": {
+        "anchor_color": 16751052,
+        "vector_color": 16753920,
+        "anchor_size": 4,
+        "vector_size": 8
+      }
+    },
+
+    {
+      "name": "Perseus",
+      "label": "Hero",
+      "intent": "Directional proxy using Perseus anchors (catalog-resolvable; Mirfak may not exist by that name in your catalogs).",
+      "vector_length_ly": 1200,
+      "anchor_groups": [
+        {
+          "group": "core",
+          "description": "Catalog-resolvable Perseus anchors.",
+          "anchors": [
+            { "system": "Algol", "weight": 1.0, "note": "Resolved in your build output" },
+            { "system": "45 Epsilon Persei", "weight": 0.8, "note": "Shown in your find_system_names output (numbered variant)" },
+            { "system": "39 Delta Persei", "weight": 0.8, "note": "Shown in your find_system_names output" },
+            { "system": "35 Sigma Persei", "weight": 0.7, "note": "Shown in your find_system_names output" },
+            { "system": "X Persei", "weight": 0.7, "note": "Shown in your find_system_names output" }
+          ]
+        },
+        {
+          "group": "extended",
+          "description": "Extra Perseus anchors to increase stability (all appear in your search output).",
+          "anchors": [
+            { "system": "Theta Persei", "weight": 0.6 },
+            { "system": "Iota Persei", "weight": 0.6 },
+            { "system": "38 Omicron Persei", "weight": 0.5 },
+            { "system": "17 Persei", "weight": 0.4 }
+          ]
+        }
+      ],
+      "breadcrumbs": {
+        "myth_label": "Hero",
+        "riddle_mapping": "Hero → Perseus",
+        "notes": [
+          "If this vector points into a low-coverage void in your EPS/Omphalos map, that’s a strong actionable breadcrumb.",
+          "Perseus often resolves best using numbered/lettered Persei entries rather than common star names."
+        ]
+      },
+      "render_hints": {
+        "anchor_color": 16753920,
+        "vector_color": 16770048,
+        "anchor_size": 4,
+        "vector_size": 8
+      }
+    }
+  ]
+}

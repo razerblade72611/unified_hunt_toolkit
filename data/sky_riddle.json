@@ -1,0 +1,79 @@
+{
+  "meta": {
+    "layer": "sky_riddle",
+    "center": "Sol",
+    "radius": 400,
+    "note": "This layer is a sky-direction visualization (RA/Dec -> unit sphere) for the 'Vain Queen / Giraffe / Daughter / Hero' constellation hypothesis. It is NOT Elite's galactic XYZ."
+  },
+  "nodes": [
+    { "id": "Sol", "x": 0, "y": 0, "z": 0, "type": "origin", "label": "Sol (observer)" },
+
+    {
+      "id": "Cassiopeia",
+      "type": "constellation",
+      "role": "Vain Queen",
+      "ra_hours": 0.8667,
+      "dec_deg": 61,
+      "x": 188.9532,
+      "y": 349.8479,
+      "z": 43.6250,
+      "label": "Cassiopeia — 'Vain Queen'"
+    },
+    {
+      "id": "Camelopardalis",
+      "type": "constellation",
+      "role": "Giraffe",
+      "ra_hours": 6.15,
+      "dec_deg": 69,
+      "x": -5.6278,
+      "y": 373.4322,
+      "z": 143.2367,
+      "label": "Camelopardalis — 'Giraffe'"
+    },
+    {
+      "id": "Perseus",
+      "type": "constellation",
+      "role": "Hero",
+      "ra_hours": 3.5167,
+      "dec_deg": 44,
+      "x": 174.1628,
+      "y": 277.8633,
+      "z": 229.0399,
+      "label": "Perseus — 'Hero'"
+    },
+    {
+      "id": "Andromeda",
+      "type": "constellation",
+      "role": "Daughter",
+      "ra_hours": 0.5667,
+      "dec_deg": 41,
+      "x": 298.5675,
+      "y": 262.4236,
+      "z": 44.6239,
+      "label": "Andromeda — 'Daughter' (optional mapping)"
+    },
+
+    {
+      "id": "Myth_Direction",
+      "type": "vector",
+      "role": "Average direction",
+      "x": 197.2954,
+      "y": 379.9921,
+      "z": 138.4937,
+      "label": "Myth Cluster Direction (avg of the above)"
+    }
+  ],
+  "links": [
+    { "source": "Sol", "target": "Cassiopeia", "kind": "ray" },
+    { "source": "Sol", "target": "Camelopardalis", "kind": "ray" },
+    { "source": "Sol", "target": "Perseus", "kind": "ray" },
+    { "source": "Sol", "target": "Andromeda", "kind": "ray" },
+
+    { "source": "Cassiopeia", "target": "Camelopardalis", "kind": "myth" },
+    { "source": "Cassiopeia", "target": "Perseus", "kind": "myth" },
+    { "source": "Cassiopeia", "target": "Andromeda", "kind": "myth" },
+    { "source": "Andromeda", "target": "Perseus", "kind": "myth" },
+
+    { "source": "Sol", "target": "Myth_Direction", "kind": "vector" }
+  ]
+}

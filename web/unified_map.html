@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Unified Guardian / Omphalos Map</title>
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
+    #ui {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 10; background: rgba(0,0,0,0.6);
+      padding: 8px 12px; font-size: 12px; border-radius: 4px;
+    }
+    label { display: block; margin-bottom: 4px; }
+  </style>
+</head>
+<body>
+  <div id="ui">
+    <div><strong>Unified Map</strong></div>
+    <label><input type="checkbox" id="toggleGuardian" checked /> Guardian Shell / Hotspots</label>
+    <label><input type="checkbox" id="toggleOmphalos" checked /> Omphalos / Raxxla Network</label>
+    <div id="status">Loading JSON…</div>
+  </div>
+  <script src="https://unpkg.com/three@0.160.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.160.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100000);
+    camera.position.set(0, 0, 500);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new THREE.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.6);
+    dirLight.position.set(1, 1, 1);
+    scene.add(dirLight);
+
+    // Groups for layers
+    const guardianGroup = new THREE.Group();
+    const omphalosGroup = new THREE.Group();
+    scene.add(guardianGroup);
+    scene.add(omphalosGroup);
+
+    const statusEl = document.getElementById("status");
+    const toggleGuardian = document.getElementById("toggleGuardian");
+    const toggleOmphalos = document.getElementById("toggleOmphalos");
+
+    // Materials
+    const guardianNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const omphalosNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ffff });
+    const centerMaterial = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+    const guardianLineMaterial = new THREE.LineBasicMaterial({ color: 0x007700, transparent: true, opacity: 0.6 });
+    const omphalosLineMaterial = new THREE.LineBasicMaterial({ color: 0x4444ff, transparent: true, opacity: 0.7 });
+
+    const nodeGeometry = new THREE.SphereGeometry(2, 12, 12);
+
+    function addLayer(group, data, isGuardian) {
+      const nodes = data.nodes || [];
+      const links = data.links || [];
+      const centerName = data.meta.center || null;
+
+      const nodeIndex = {};
+      nodes.forEach(n => { nodeIndex[n.id] = n; });
+
+      // Nodes
+      nodes.forEach(n => {
+        const geom = nodeGeometry.clone();
+        let mat = isGuardian ? guardianNodeMaterial : omphalosNodeMaterial;
+        if (centerName && n.id === centerName) {
+          mat = centerMaterial;
+        }
+        const mesh = new THREE.Mesh(geom, mat);
+        // Axis mapping: (x, z, y) to keep consistency with some ED maps
+        mesh.position.set(n.x || 0, n.z || 0, n.y || 0);
+        mesh.userData = n;
+        group.add(mesh);
+      });
+
+      // Links
+      links.forEach(l => {
+        const a = nodeIndex[l.source];
+        const b = nodeIndex[l.target];
+        if (!a || !b) return;
+        const points = [];
+        points.push(new THREE.Vector3(a.x || 0, a.z || 0, a.y || 0));
+        points.push(new THREE.Vector3(b.x || 0, b.z || 0, b.y || 0));
+        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const mat = isGuardian ? guardianLineMaterial : omphalosLineMaterial;
+        const line = new THREE.Line(geometry, mat);
+        group.add(line);
+      });
+    }
+
+    function loadJSON(url) {
+      return fetch(url).then(r => {
+        if (!r.ok) throw new Error("HTTP " + r.status + " for " + url);
+        return r.json();
+      });
+    }
+
+    Promise.all([
+      loadJSON("../data/guardian_map.json").catch(err => ({ error: err.toString(), nodes: [], links: [], meta: { layer: "guardian" } })),
+      loadJSON("../data/omphalos_map.json").catch(err => ({ error: err.toString(), nodes: [], links: [], meta: { layer: "omphalos" } })),
+    ])
+    .then(([guardianData, omphalosData]) => {
+      const gCount = guardianData.nodes ? guardianData.nodes.length : 0;
+      const oCount = omphalosData.nodes ? omphalosData.nodes.length : 0;
+      statusEl.textContent = `Guardian nodes: ${gCount}, Omphalos nodes: ${oCount}`;
+
+      if (!guardianData.error) addLayer(guardianGroup, guardianData, true);
+      if (!omphalosData.error) addLayer(omphalosGroup, omphalosData, false);
+    })
+    .catch(err => {
+      statusEl.textContent = "Error loading JSON: " + err;
+    });
+
+    toggleGuardian.addEventListener("change", () => {
+      guardianGroup.visible = toggleGuardian.checked;
+    });
+    toggleOmphalos.addEventListener("change", () => {
+      omphalosGroup.visible = toggleOmphalos.checked;
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>
