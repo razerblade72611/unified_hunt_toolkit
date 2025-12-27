@@ -1,0 +1,1685 @@
+{
+  "nodes": [
+    {
+      "id": "Agnairy DH-F c14-1310",
+      "label": "Agnairy DH-F c14-1310",
+      "x": -2713.34375,
+      "y": -78.375,
+      "z": 22611.09375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.9446362394951775
+    },
+    {
+      "id": "Agnairy HN-D c15-2598",
+      "label": "Agnairy HN-D c15-2598",
+      "x": -2714.125,
+      "y": -84.59375,
+      "z": 22616.3125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.183248434940994
+    },
+    {
+      "id": "Agnairy HN-D c15-4220",
+      "label": "Agnairy HN-D c15-4220",
+      "x": -2716.15625,
+      "y": -78.5625,
+      "z": 22615.9375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.987362232604145
+    },
+    {
+      "id": "Agnairy JH-U e3-2113",
+      "label": "Agnairy JH-U e3-2113",
+      "x": -2713.65625,
+      "y": -77.03125,
+      "z": 22617.5,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.252122345016787
+    },
+    {
+      "id": "Chau Euq FC-D d12-0",
+      "label": "Chau Euq FC-D d12-0",
+      "x": -4736.96875,
+      "y": -15.3125,
+      "z": 61488.15625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.577718701515541
+    },
+    {
+      "id": "Cliewoae DS-H d11-0",
+      "label": "Cliewoae DS-H d11-0",
+      "x": -5574.4375,
+      "y": -103.1875,
+      "z": 61346.75,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.473709083491675
+    },
+    {
+      "id": "Cliewoae UF-L d9-0",
+      "label": "Cliewoae UF-L d9-0",
+      "x": -5629.09375,
+      "y": -63.625,
+      "z": 61189.40625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.473711652035633
+    },
+    {
+      "id": "Col 173 Sector HR-M b23-3",
+      "label": "Col 173 Sector HR-M b23-3",
+      "x": 1024.28125,
+      "y": -191.71875,
+      "z": -193.8125,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Col 173 Sector ZL-L b24-2",
+      "label": "Col 173 Sector ZL-L b24-2",
+      "x": 896.78125,
+      "y": -134.90625,
+      "z": -182.09375,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Cyuefoo LC-D d12-0",
+      "label": "Cyuefoo LC-D d12-0",
+      "x": -33742.96875,
+      "y": 53.5,
+      "z": 26.46875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.624284103730896
+    },
+    {
+      "id": "Dryio Bloo HN-A d1-248",
+      "label": "Dryio Bloo HN-A d1-248",
+      "x": -6321.375,
+      "y": -1586.6875,
+      "z": 28525.28125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.301254971436004
+    },
+    {
+      "id": "Dryio Bloo LT-Y d1-1290",
+      "label": "Dryio Bloo LT-Y d1-1290",
+      "x": -6378.03125,
+      "y": -1600.0625,
+      "z": 28578.28125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.270550752235474
+    },
+    {
+      "id": "Dryio Bloo LT-Y d1-632",
+      "label": "Dryio Bloo LT-Y d1-632",
+      "x": -6327.15625,
+      "y": -1622.375,
+      "z": 28578.78125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.227828927628351
+    },
+    {
+      "id": "Dryio Bloo RU-W d2-599",
+      "label": "Dryio Bloo RU-W d2-599",
+      "x": -6350.21875,
+      "y": -1633.78125,
+      "z": 28629.625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.227825625333086
+    },
+    {
+      "id": "Dryio Bloo YE-A g1656",
+      "label": "Dryio Bloo YE-A g1656",
+      "x": -6264.15625,
+      "y": -1625.90625,
+      "z": 28544.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.49774875291523
+    },
+    {
+      "id": "Dryoea Flyi II-S e4-6870",
+      "label": "Dryoea Flyi II-S e4-6870",
+      "x": -5141.59375,
+      "y": -289.46875,
+      "z": 19057.90625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.304650940079941
+    },
+    {
+      "id": "Dryu Chraea FH-D d12-49",
+      "label": "Dryu Chraea FH-D d12-49",
+      "x": -23799.71875,
+      "y": 71.125,
+      "z": 29480.125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.2643616657438335
+    },
+    {
+      "id": "Eimbaith LW-W e1-290",
+      "label": "Eimbaith LW-W e1-290",
+      "x": -1421.71875,
+      "y": 1618.3125,
+      "z": 30063.0625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.428530030001005
+    },
+    {
+      "id": "Eol Prou CT-R a35-2",
+      "label": "Eol Prou CT-R a35-2",
+      "x": -9544.65625,
+      "y": -951.03125,
+      "z": 19795.34375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.145281003787331
+    },
+    {
+      "id": "Eol Prou HQ-N c7-78",
+      "label": "Eol Prou HQ-N c7-78",
+      "x": -9526.53125,
+      "y": -929.78125,
+      "z": 19771.375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.431487319173844
+    },
+    {
+      "id": "Eol Prou PX-T d3-1645",
+      "label": "Eol Prou PX-T d3-1645",
+      "x": -9583.375,
+      "y": -896.21875,
+      "z": 19779.46875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.587181157562453
+    },
+    {
+      "id": "Eol Prou PX-T d3-202",
+      "label": "Eol Prou PX-T d3-202",
+      "x": -9540.0,
+      "y": -878.34375,
+      "z": 19792.9375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.166607022621102
+    },
+    {
+      "id": "Eol Prou PX-T d3-888",
+      "label": "Eol Prou PX-T d3-888",
+      "x": -9549.21875,
+      "y": -890.1875,
+      "z": 19807.75,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.915791349605391
+    },
+    {
+      "id": "Eol Prou RS-T d3-141",
+      "label": "Eol Prou RS-T d3-141",
+      "x": -9576.5,
+      "y": -942.96875,
+      "z": 19782.96875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.197309718945902
+    },
+    {
+      "id": "Eol Prou RS-T d3-314",
+      "label": "Eol Prou RS-T d3-314",
+      "x": -9534.6875,
+      "y": -939.875,
+      "z": 19789.84375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.410083300765772
+    },
+    {
+      "id": "Eol Prou RS-T d3-557",
+      "label": "Eol Prou RS-T d3-557",
+      "x": -9541.9375,
+      "y": -936.28125,
+      "z": 19800.25,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.166606046915672
+    },
+    {
+      "id": "Eol Prou RS-T d3-575",
+      "label": "Eol Prou RS-T d3-575",
+      "x": -9577.84375,
+      "y": -946.46875,
+      "z": 19786.0625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.383896143042839
+    },
+    {
+      "id": "Eol Prou RS-T d3-618",
+      "label": "Eol Prou RS-T d3-618",
+      "x": -9533.6875,
+      "y": -954.1875,
+      "z": 19806.3125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.38389616580319
+    },
+    {
+      "id": "Eol Prou ZY-O a37-0",
+      "label": "Eol Prou ZY-O a37-0",
+      "x": -9574.15625,
+      "y": -913.65625,
+      "z": 19815.09375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.218708681045476
+    },
+    {
+      "id": "Eorl Bre XK-J c24-190",
+      "label": "Eorl Bre XK-J c24-190",
+      "x": -7758.59375,
+      "y": 684.375,
+      "z": 30697.5,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.945425437976454
+    },
+    {
+      "id": "Eorl Bre XU-E d12-272",
+      "label": "Eorl Bre XU-E d12-272",
+      "x": -7772.28125,
+      "y": 713.15625,
+      "z": 30741.53125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.192118592504013
+    },
+    {
+      "id": "Flyoo Groa SO-Z e0",
+      "label": "Flyoo Groa SO-Z e0",
+      "x": -26482.4375,
+      "y": -78.78125,
+      "z": 50335.125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.510799491947942
+    },
+    {
+      "id": "Flyoo Groa XW-W c4-13",
+      "label": "Flyoo Groa XW-W c4-13",
+      "x": -26476.0625,
+      "y": -75.75,
+      "z": 50341.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.4784198801954345
+    },
+    {
+      "id": "Greae Phio DT-G d11-1570",
+      "label": "Greae Phio DT-G d11-1570",
+      "x": 1317.15625,
+      "y": -483.625,
+      "z": 16570.21875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.520796428174055
+    },
+    {
+      "id": "Gru Hypai DL-X e1-20",
+      "label": "Gru Hypai DL-X e1-20",
+      "x": 3384.125,
+      "y": -364.15625,
+      "z": 13444.4375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.844300326466118
+    },
+    {
+      "id": "Gru Hypai QT-M c9-22",
+      "label": "Gru Hypai QT-M c9-22",
+      "x": 3379.65625,
+      "y": -369.78125,
+      "z": 13441.96875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.8443012860990615
+    },
+    {
+      "id": "HIP 40749",
+      "label": "HIP 40749",
+      "x": 929.53125,
+      "y": -109.40625,
+      "z": -86.4375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.153381785700215
+    },
+    {
+      "id": "HIP 44747",
+      "label": "HIP 44747",
+      "x": 744.125,
+      "y": 13.6875,
+      "z": -24.6875,
+      "role": "potential_guardian_hotspots_GMM",
+      "sources": [
+        "potential_guardian_hotspots_GMM.json"
+      ]
+    },
+    {
+      "id": "Hyuedau UY-S e3-5",
+      "label": "Hyuedau UY-S e3-5",
+      "x": 19779.6875,
+      "y": -5.21875,
+      "z": -320.0625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.2436027929951
+    },
+    {
+      "id": "IC 2391 Sector ZE-A d101",
+      "label": "IC 2391 Sector ZE-A d101",
+      "x": 526.5,
+      "y": -86.375,
+      "z": -37.9375,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Iorady EI-B d13-0",
+      "label": "Iorady EI-B d13-0",
+      "x": -0.3125,
+      "y": -3.59375,
+      "z": 65395.28125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.6234768284438905
+    },
+    {
+      "id": "Juenae OX-U e2-8852",
+      "label": "Juenae OX-U e2-8852",
+      "x": 652.46875,
+      "y": -1056.5,
+      "z": 26400.375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.916149226362415
+    },
+    {
+      "id": "Lyed XJ-I d9-0",
+      "label": "Lyed XJ-I d9-0",
+      "x": 10938.875,
+      "y": 35.375,
+      "z": -16845.28125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.475984064431718
+    },
+    {
+      "id": "Lyed YJ-I d9-0",
+      "label": "Lyed YJ-I d9-0",
+      "x": 11007.46875,
+      "y": 44.84375,
+      "z": -16899.75,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.475970133351282
+    },
+    {
+      "id": "Myriesly CL-P e5-7383",
+      "label": "Myriesly CL-P e5-7383",
+      "x": -633.375,
+      "y": 114.65625,
+      "z": 25560.84375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.605687724726166
+    },
+    {
+      "id": "Myriesly HR-N e6-4354",
+      "label": "Myriesly HR-N e6-4354",
+      "x": -530.125,
+      "y": 38.84375,
+      "z": 25725.90625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 10.479607969012696
+    },
+    {
+      "id": "Myriesly MS-T e3-3831",
+      "label": "Myriesly MS-T e3-3831",
+      "x": -586.875,
+      "y": 646.875,
+      "z": 25214.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.436492149053156
+    },
+    {
+      "id": "NGC 2451A Sector VJ-R c4-22",
+      "label": "NGC 2451A Sector VJ-R c4-22",
+      "x": 746.34375,
+      "y": -153.09375,
+      "z": -164.25,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Ovomly AF-H d10-7",
+      "label": "Ovomly AF-H d10-7",
+      "x": -19372.25,
+      "y": -1004.0625,
+      "z": 7551.34375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.792709390962634
+    },
+    {
+      "id": "Ovomly AL-F d11-14",
+      "label": "Ovomly AL-F d11-14",
+      "x": -19734.0625,
+      "y": -1053.3125,
+      "z": 7626.90625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.850853703552239
+    },
+    {
+      "id": "Ovomly BA-Q d5-0",
+      "label": "Ovomly BA-Q d5-0",
+      "x": -19824.96875,
+      "y": -1063.40625,
+      "z": 7102.15625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.762169578812098
+    },
+    {
+      "id": "Ovomly EV-P d5-2",
+      "label": "Ovomly EV-P d5-2",
+      "x": -19721.53125,
+      "y": -1102.78125,
+      "z": 7174.71875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.8508841188041165
+    },
+    {
+      "id": "Ovomly GB-O d6-18",
+      "label": "Ovomly GB-O d6-18",
+      "x": -19873.5,
+      "y": -1089.40625,
+      "z": 7252.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.792646664432546
+    },
+    {
+      "id": "Ovomly HG-O d6-0",
+      "label": "Ovomly HG-O d6-0",
+      "x": -19610.40625,
+      "y": -1000.65625,
+      "z": 7217.46875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.28888901926046
+    },
+    {
+      "id": "Ovomly IM-D d12-14",
+      "label": "Ovomly IM-D d12-14",
+      "x": -19584.875,
+      "y": -1080.4375,
+      "z": 7688.3125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.69163497992205
+    },
+    {
+      "id": "Ovomly LB-O d6-13",
+      "label": "Ovomly LB-O d6-13",
+      "x": -19498.125,
+      "y": -1085.71875,
+      "z": 7231.78125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.85091749965149
+    },
+    {
+      "id": "Ovomly MB-O d6-1",
+      "label": "Ovomly MB-O d6-1",
+      "x": -19421.5625,
+      "y": -1073.96875,
+      "z": 7247.25,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.79272078286523
+    },
+    {
+      "id": "Ovomly MM-M d7-17",
+      "label": "Ovomly MM-M d7-17",
+      "x": -19534.0,
+      "y": -1046.15625,
+      "z": 7300.84375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.6715767657271945
+    },
+    {
+      "id": "Ovomly PH-M d7-3",
+      "label": "Ovomly PH-M d7-3",
+      "x": -19437.5625,
+      "y": -1107.25,
+      "z": 7328.65625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.762205585033391
+    },
+    {
+      "id": "Ovomly RS-K d8-9",
+      "label": "Ovomly RS-K d8-9",
+      "x": -19463.21875,
+      "y": -1045.0625,
+      "z": 7375.34375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.2472359873947125
+    },
+    {
+      "id": "Ovomly TE-H d10-14",
+      "label": "Ovomly TE-H d10-14",
+      "x": -19963.34375,
+      "y": -1047.75,
+      "z": 7518.6875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.691586732559508
+    },
+    {
+      "id": "Ovomly VZ-G d10-0",
+      "label": "Ovomly VZ-G d10-0",
+      "x": -19924.5625,
+      "y": -1125.5,
+      "z": 7544.25,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.671519505995934
+    },
+    {
+      "id": "Ovomly WT-I d9-14",
+      "label": "Ovomly WT-I d9-14",
+      "x": -19556.09375,
+      "y": -1093.0,
+      "z": 7424.1875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.81616572971098
+    },
+    {
+      "id": "Ovomly YE-H d10-3",
+      "label": "Ovomly YE-H d10-3",
+      "x": -19524.1875,
+      "y": -1006.875,
+      "z": 7543.15625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.81616429919336
+    },
+    {
+      "id": "Ovomly ZF-F d11-1",
+      "label": "Ovomly ZF-F d11-1",
+      "x": -19927.5,
+      "y": -1101.78125,
+      "z": 7617.46875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.671515979558962
+    },
+    {
+      "id": "Ovomly ZT-R d4-7",
+      "label": "Ovomly ZT-R d4-7",
+      "x": -19625.40625,
+      "y": -1004.0,
+      "z": 7069.625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.826431977735859
+    },
+    {
+      "id": "Pallaeni",
+      "label": "Pallaeni",
+      "x": 112.6875,
+      "y": 47.125,
+      "z": 128.4375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.535284975541929
+    },
+    {
+      "id": "Pencil Sector OI-T c3-25",
+      "label": "Pencil Sector OI-T c3-25",
+      "x": 812.71875,
+      "y": -16.375,
+      "z": 23.28125,
+      "role": "potential_guardian_hotspots_GMM",
+      "sources": [
+        "potential_guardian_hotspots_GMM.json"
+      ]
+    },
+    {
+      "id": "Phleedgaa UJ-Q e5-185",
+      "label": "Phleedgaa UJ-Q e5-185",
+      "x": -5370.0625,
+      "y": -467.0,
+      "z": 34479.03125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.74037396332248
+    },
+    {
+      "id": "Phraa Pra HH-U e3-1354",
+      "label": "Phraa Pra HH-U e3-1354",
+      "x": 823.3125,
+      "y": -1416.125,
+      "z": 26584.4375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.530059864532933
+    },
+    {
+      "id": "Pleiades Sector GW-W c1-15",
+      "label": "Pleiades Sector GW-W c1-15",
+      "x": -76.9375,
+      "y": -153.71875,
+      "z": -346.625,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Pleiades Sector RO-Q b5-0",
+      "label": "Pleiades Sector RO-Q b5-0",
+      "x": -80.46875,
+      "y": -140.21875,
+      "z": -324.15625,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Pyraea Euq AF-R d4-0",
+      "label": "Pyraea Euq AF-R d4-0",
+      "x": -4687.375,
+      "y": -1.4375,
+      "z": 62086.1875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.23667084437474
+    },
+    {
+      "id": "Pyrooe Dryiae CC-B d1-0",
+      "label": "Pyrooe Dryiae CC-B d1-0",
+      "x": -5017.875,
+      "y": -97.03125,
+      "z": 61737.53125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.577714740534213
+    },
+    {
+      "id": "Shrogeau GG-Y e119",
+      "label": "Shrogeau GG-Y e119",
+      "x": 5430.875,
+      "y": 31.71875,
+      "z": 20932.0625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.917767122967761
+    },
+    {
+      "id": "Synuefe AH-J d10-103",
+      "label": "Synuefe AH-J d10-103",
+      "x": 777.53125,
+      "y": -158.28125,
+      "z": -117.4375,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe AH-J d10-20",
+      "label": "Synuefe AH-J d10-20",
+      "x": 759.21875,
+      "y": -148.3125,
+      "z": -145.75,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe AH-J d10-46",
+      "label": "Synuefe AH-J d10-46",
+      "x": 741.3125,
+      "y": -164.8125,
+      "z": -138.78125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe AS-H d11-9",
+      "label": "Synuefe AS-H d11-9",
+      "x": 610.3125,
+      "y": -65.125,
+      "z": -101.84375,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe BE-R c21-35",
+      "label": "Synuefe BE-R c21-35",
+      "x": 782.6875,
+      "y": -96.15625,
+      "z": -135.03125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe BH-J d10-68",
+      "label": "Synuefe BH-J d10-68",
+      "x": 831.375,
+      "y": -149.125,
+      "z": -175.96875,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe BO-G b44-6",
+      "label": "Synuefe BO-G b44-6",
+      "x": 687.3125,
+      "y": -96.75,
+      "z": -112.125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe BS-H d11-114",
+      "label": "Synuefe BS-H d11-114",
+      "x": 678.5,
+      "y": -62.40625,
+      "z": -46.9375,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe BZ-Q c21-11",
+      "label": "Synuefe BZ-Q c21-11",
+      "x": 727.21875,
+      "y": -119.90625,
+      "z": -128.15625,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe CE-R c21-6",
+      "label": "Synuefe CE-R c21-6",
+      "x": 828.1875,
+      "y": -78.0,
+      "z": -105.1875,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json",
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Synuefe CN-H d11-63",
+      "label": "Synuefe CN-H d11-63",
+      "x": 610.96875,
+      "y": -145.78125,
+      "z": -57.90625,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe CS-H d11-121",
+      "label": "Synuefe CS-H d11-121",
+      "x": 746.09375,
+      "y": -100.78125,
+      "z": -86.625,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe DJ-G b44-3",
+      "label": "Synuefe DJ-G b44-3",
+      "x": 679.59375,
+      "y": -105.6875,
+      "z": -122.40625,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe DK-D b46-12",
+      "label": "Synuefe DK-D b46-12",
+      "x": 636.3125,
+      "y": -53.65625,
+      "z": -68.8125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe DK-D b46-4",
+      "label": "Synuefe DK-D b46-4",
+      "x": 652.9375,
+      "y": -63.90625,
+      "z": -80.78125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe DK-P c22-35",
+      "label": "Synuefe DK-P c22-35",
+      "x": 711.46875,
+      "y": -102.6875,
+      "z": -89.53125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe DZ-Q c21-14",
+      "label": "Synuefe DZ-Q c21-14",
+      "x": 793.96875,
+      "y": -122.46875,
+      "z": -135.03125,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe EA-U b50-3",
+      "label": "Synuefe EA-U b50-3",
+      "x": 673.78125,
+      "y": -106.625,
+      "z": 25.75,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe ED-I b43-8",
+      "label": "Synuefe ED-I b43-8",
+      "x": 791.1875,
+      "y": -120.625,
+      "z": -129.40625,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe EN-H d11-106",
+      "label": "Synuefe EN-H d11-106",
+      "x": 785.15625,
+      "y": -167.0625,
+      "z": -75.46875,
+      "role": "guardian_known_seed",
+      "sources": [
+        "guardian_known_seed.json"
+      ]
+    },
+    {
+      "id": "Synuefe EU-Q c21-10",
+      "label": "Synuefe EU-Q c21-10",
+      "x": 758.65625,
+      "y": -176.90625,
+      "z": -133.21875,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Synuefe IL-N c23-15",
+      "label": "Synuefe IL-N c23-15",
+      "x": 658.28125,
+      "y": -117.96875,
+      "z": -46.3125,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Synuefe MR-Q b52-2",
+      "label": "Synuefe MR-Q b52-2",
+      "x": 711.78125,
+      "y": -91.78125,
+      "z": 55.78125,
+      "role": "potential_guardian_hotspots_GMM",
+      "sources": [
+        "potential_guardian_hotspots_GMM.json"
+      ]
+    },
+    {
+      "id": "Synuefe NA-V b49-1",
+      "label": "Synuefe NA-V b49-1",
+      "x": 759.78125,
+      "y": -197.5,
+      "z": -2.65625,
+      "role": "potential_guardian_hotspots_GMM",
+      "sources": [
+        "potential_guardian_hotspots_GMM.json"
+      ]
+    },
+    {
+      "id": "Synuefe NL-N c23-4",
+      "label": "Synuefe NL-N c23-4",
+      "x": 860.125,
+      "y": -124.59375,
+      "z": -61.0625,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Synuefe OF-E b45-4",
+      "label": "Synuefe OF-E b45-4",
+      "x": 751.0625,
+      "y": -157.71875,
+      "z": -86.09375,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Synuefe ZL-J d10-109",
+      "label": "Synuefe ZL-J d10-109",
+      "x": 852.65625,
+      "y": -51.125,
+      "z": -124.84375,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Synuefe ZL-J d10-119",
+      "label": "Synuefe ZL-J d10-119",
+      "x": 834.21875,
+      "y": -51.21875,
+      "z": -154.65625,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Thaile HW-V e2-7",
+      "label": "Thaile HW-V e2-7",
+      "x": 10124.09375,
+      "y": -339.15625,
+      "z": 4641.09375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 8.557620866883974
+    },
+    {
+      "id": "Traikeou XK-N d7-6",
+      "label": "Traikeou XK-N d7-6",
+      "x": -7170.21875,
+      "y": 628.71875,
+      "z": 4695.84375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.324854171925752
+    },
+    {
+      "id": "Vegnoae WE-R e4-9257",
+      "label": "Vegnoae WE-R e4-9257",
+      "x": -1017.5625,
+      "y": 108.625,
+      "z": 36920.65625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.685401612872981
+    },
+    {
+      "id": "Vegnue AR-C d13-183",
+      "label": "Vegnue AR-C d13-183",
+      "x": -5595.9375,
+      "y": 587.15625,
+      "z": 37238.0,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.187056725710399
+    },
+    {
+      "id": "Vegnue JU-T a106-1",
+      "label": "Vegnue JU-T a106-1",
+      "x": -5690.75,
+      "y": 645.9375,
+      "z": 37204.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.676155057584755
+    },
+    {
+      "id": "Vegnue OO-F a100-0",
+      "label": "Vegnue OO-F a100-0",
+      "x": -5683.03125,
+      "y": 619.75,
+      "z": 37133.6875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.60274061879247
+    },
+    {
+      "id": "Vegnue UP-E d12-36",
+      "label": "Vegnue UP-E d12-36",
+      "x": -5587.90625,
+      "y": 621.3125,
+      "z": 37136.625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.4304918245863
+    },
+    {
+      "id": "Vegnue UP-E d12-49",
+      "label": "Vegnue UP-E d12-49",
+      "x": -5641.59375,
+      "y": 653.71875,
+      "z": 37130.875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.382913085057604
+    },
+    {
+      "id": "Vegnue VK-E d12-1246",
+      "label": "Vegnue VK-E d12-1246",
+      "x": -5707.75,
+      "y": 607.78125,
+      "z": 37164.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.888889921691108
+    },
+    {
+      "id": "Vegnue VK-E d12-1562",
+      "label": "Vegnue VK-E d12-1562",
+      "x": -5686.625,
+      "y": 582.65625,
+      "z": 37126.1875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.144340888252487
+    },
+    {
+      "id": "Vegnue VK-E d12-529",
+      "label": "Vegnue VK-E d12-529",
+      "x": -5665.90625,
+      "y": 611.65625,
+      "z": 37137.0625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.382912735080408
+    },
+    {
+      "id": "Vegnue VK-E d12-809",
+      "label": "Vegnue VK-E d12-809",
+      "x": -5669.0,
+      "y": 595.96875,
+      "z": 37159.96875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.187059074822135
+    },
+    {
+      "id": "Vegnue WM-P a108-1",
+      "label": "Vegnue WM-P a108-1",
+      "x": -5716.84375,
+      "y": 605.71875,
+      "z": 37220.6875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.645456324016004
+    },
+    {
+      "id": "Vegnue ZQ-C d13-832",
+      "label": "Vegnue ZQ-C d13-832",
+      "x": -5730.59375,
+      "y": 560.75,
+      "z": 37182.53125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.430489258306256
+    },
+    {
+      "id": "Vela Dark Region DL-Y d112",
+      "label": "Vela Dark Region DL-Y d112",
+      "x": 924.46875,
+      "y": -171.8125,
+      "z": -98.21875,
+      "role": "guardian_ruins_and_structures",
+      "sources": [
+        "guardian_ruins_and_structures.json"
+      ]
+    },
+    {
+      "id": "Wepaa BA-A g1045",
+      "label": "Wepaa BA-A g1045",
+      "x": -9388.4375,
+      "y": -978.96875,
+      "z": 23283.46875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.690840023183036
+    },
+    {
+      "id": "Wepaa BA-A g1104",
+      "label": "Wepaa BA-A g1104",
+      "x": -9323.625,
+      "y": -917.84375,
+      "z": 23293.90625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.148459838869066
+    },
+    {
+      "id": "Wepaa BA-A g1126",
+      "label": "Wepaa BA-A g1126",
+      "x": -9227.90625,
+      "y": -852.03125,
+      "z": 23426.78125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.504723273481228
+    },
+    {
+      "id": "Wepaa BA-A g1289",
+      "label": "Wepaa BA-A g1289",
+      "x": -9314.78125,
+      "y": -894.125,
+      "z": 23826.625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.898016101075654
+    },
+    {
+      "id": "Wepaa BA-A g142",
+      "label": "Wepaa BA-A g142",
+      "x": -9420.875,
+      "y": -1124.6875,
+      "z": 23827.40625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.624304860460304
+    },
+    {
+      "id": "Wepaa BA-A g143",
+      "label": "Wepaa BA-A g143",
+      "x": -9557.78125,
+      "y": -832.15625,
+      "z": 23728.15625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.67320669696186
+    },
+    {
+      "id": "Wepaa BA-A g149",
+      "label": "Wepaa BA-A g149",
+      "x": -9536.5,
+      "y": -1067.40625,
+      "z": 23379.5625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.898049312435405
+    },
+    {
+      "id": "Wepaa BA-A g158",
+      "label": "Wepaa BA-A g158",
+      "x": -9288.03125,
+      "y": -704.125,
+      "z": 23811.4375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.459245049585174
+    },
+    {
+      "id": "Wepaa BA-A g20",
+      "label": "Wepaa BA-A g20",
+      "x": -9497.34375,
+      "y": -938.78125,
+      "z": 23323.4375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.624348878261812
+    },
+    {
+      "id": "Wepaa BA-A g308",
+      "label": "Wepaa BA-A g308",
+      "x": -9465.59375,
+      "y": -884.8125,
+      "z": 23514.96875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.485499261021364
+    },
+    {
+      "id": "Wepaa BA-A g333",
+      "label": "Wepaa BA-A g333",
+      "x": -9310.75,
+      "y": -911.21875,
+      "z": 23438.59375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.696229207727232
+    },
+    {
+      "id": "Wepaa BA-A g60",
+      "label": "Wepaa BA-A g60",
+      "x": -9432.53125,
+      "y": -954.5625,
+      "z": 23421.625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.669789524743614
+    },
+    {
+      "id": "Wepaa DQ-Y f610",
+      "label": "Wepaa DQ-Y f610",
+      "x": -9330.4375,
+      "y": -552.46875,
+      "z": 23834.5625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.658000605385604
+    },
+    {
+      "id": "Wepaa FL-Y e1770",
+      "label": "Wepaa FL-Y e1770",
+      "x": -9735.1875,
+      "y": -1073.65625,
+      "z": 23485.0,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.690806852550775
+    },
+    {
+      "id": "Wepaa FL-Y e3409",
+      "label": "Wepaa FL-Y e3409",
+      "x": -9730.75,
+      "y": -1022.375,
+      "z": 23452.84375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.78954947167048
+    },
+    {
+      "id": "Wepaa FL-Y e3927",
+      "label": "Wepaa FL-Y e3927",
+      "x": -9720.375,
+      "y": -1017.84375,
+      "z": 23468.8125,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.684453941767736
+    },
+    {
+      "id": "Wepaa GG-Y f2031",
+      "label": "Wepaa GG-Y f2031",
+      "x": -9396.375,
+      "y": -1071.09375,
+      "z": 23615.375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.679052495085625
+    },
+    {
+      "id": "Wepaa GG-Y f3701",
+      "label": "Wepaa GG-Y f3701",
+      "x": -9600.34375,
+      "y": -1144.4375,
+      "z": 23578.25,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.837899720401063
+    },
+    {
+      "id": "Wepaa HG-Y f683",
+      "label": "Wepaa HG-Y f683",
+      "x": -9308.46875,
+      "y": -1039.4375,
+      "z": 23752.6875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.434064422842919
+    },
+    {
+      "id": "Wepaa HL-Y e3808",
+      "label": "Wepaa HL-Y e3808",
+      "x": -9427.53125,
+      "y": -1019.4375,
+      "z": 23566.46875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.645364557288091
+    },
+    {
+      "id": "Wepaa ST-R e4-6560",
+      "label": "Wepaa ST-R e4-6560",
+      "x": -9644.375,
+      "y": -800.8125,
+      "z": 24061.34375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 6.6555494138737155
+    },
+    {
+      "id": "Xothuia FO-G d11-808",
+      "label": "Xothuia FO-G d11-808",
+      "x": -7663.1875,
+      "y": 715.90625,
+      "z": 30692.59375,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 7.126993460702984
+    },
+    {
+      "id": "Xothuia LP-E d12-730",
+      "label": "Xothuia LP-E d12-730",
+      "x": -7662.21875,
+      "y": 689.15625,
+      "z": 30723.5625,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.593951102367524
+    },
+    {
+      "id": "Xothuia QO-J c24-119",
+      "label": "Xothuia QO-J c24-119",
+      "x": -7732.96875,
+      "y": 695.5,
+      "z": 30695.6875,
+      "role": "potential_guardian_hotspots_CORR",
+      "sources": [
+        "potential_guardian_hotspots_CORR.json"
+      ],
+      "score": 5.202404011151388
+    }
+  ],
+  "links": [],
+  "meta": {
+    "layer": "guardian",
+    "center": "Sol",
+    "sources": [
+      "guardian_known_seed.json",
+      "potential_guardian_hotspots_GMM.json",
+      "potential_guardian_hotspots_CORR.json",
+      "guardian_ruins_and_structures.json"
+    ],
+    "coord_backfill": "guardian_systems.csv",
+    "notes": "Merged from guardian_sources JSONs; coords backfilled from guardian_systems.csv when possible."
+  }
+}

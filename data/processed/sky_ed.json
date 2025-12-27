@@ -1,0 +1,535 @@
+{
+  "nodes": [
+    {
+      "id": "Sol",
+      "label": "Sol",
+      "x": 0.0,
+      "y": 0.0,
+      "z": 0.0,
+      "type": "origin",
+      "role": "origin"
+    },
+    {
+      "id": "Maia",
+      "label": "Maia (Pleiades) \u2014 Black Hole reference",
+      "x": -81.78125,
+      "y": -149.4375,
+      "z": -343.375,
+      "type": "reference",
+      "role": "reference:blackhole",
+      "system": "Maia"
+    },
+    {
+      "id": "Schedar",
+      "label": "Schedar",
+      "x": -192.875,
+      "y": -24.03125,
+      "z": -119.6875,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 1.0
+    },
+    {
+      "id": "Caph",
+      "label": "Caph",
+      "x": -48.3125,
+      "y": -2.9375,
+      "z": -25.59375,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 1.0
+    },
+    {
+      "id": "Ruchbah",
+      "label": "Ruchbah",
+      "x": -78.78125,
+      "y": -3.5625,
+      "z": -60.5625,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 0.9
+    },
+    {
+      "id": "Segin",
+      "label": "Segin",
+      "x": -314.5,
+      "y": 14.21875,
+      "z": -265.53125,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 0.8
+    },
+    {
+      "id": "27 Gamma Cassiopeiae",
+      "label": "27 Gamma Cassiopeiae",
+      "x": -455.3125,
+      "y": -17.9375,
+      "z": -306.4375,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 0.8
+    },
+    {
+      "id": "Rho Cassiopeiae",
+      "label": "Rho Cassiopeiae",
+      "x": -10467.1875,
+      "y": -878.59375,
+      "z": -5035.78125,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 0.6
+    },
+    {
+      "id": "Zeta Cassiopeiae",
+      "label": "Zeta Cassiopeiae",
+      "x": -501.4375,
+      "y": -89.3125,
+      "z": -303.78125,
+      "type": "anchor",
+      "role": "sky_anchor:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "weight": 0.5
+    },
+    {
+      "id": "Cassiopeia__VECTOR",
+      "label": "Vain Queen Direction",
+      "x": -1006.7399789640519,
+      "y": -66.78700308136654,
+      "z": -649.6261316902747,
+      "type": "vector",
+      "role": "sky_vector:Cassiopeia",
+      "constellation": "Cassiopeia",
+      "constellation_label": "Vain Queen",
+      "anchors_used": [
+        "Schedar",
+        "Caph",
+        "Ruchbah",
+        "Segin",
+        "27 Gamma Cassiopeiae",
+        "Rho Cassiopeiae",
+        "Zeta Cassiopeiae"
+      ],
+      "vector_length_ly": 1200.0
+    },
+    {
+      "id": "9 Alpha Camelopardalis",
+      "label": "9 Alpha Camelopardalis",
+      "x": -3542.9375,
+      "y": 1569.59375,
+      "z": -4932.21875,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 1.0
+    },
+    {
+      "id": "10 Beta Camelopardalis",
+      "label": "10 Beta Camelopardalis",
+      "x": -428.78125,
+      "y": 179.28125,
+      "z": -737.9375,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 1.0
+    },
+    {
+      "id": "Gamma Camelopardalis",
+      "label": "Gamma Camelopardalis",
+      "x": -239.78125,
+      "y": 84.75,
+      "z": -253.125,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 0.7
+    },
+    {
+      "id": "CS Camelopardalis",
+      "label": "CS Camelopardalis",
+      "x": -1198.03125,
+      "y": 112.0625,
+      "z": -1523.625,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 0.7
+    },
+    {
+      "id": "43 Camelopardalis",
+      "label": "43 Camelopardalis",
+      "x": -485.46875,
+      "y": 426.90625,
+      "z": -735.84375,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 0.4
+    },
+    {
+      "id": "16 Camelopardalis",
+      "label": "16 Camelopardalis",
+      "x": -145.15625,
+      "y": 72.15625,
+      "z": -294.625,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 0.4
+    },
+    {
+      "id": "H Camelopardalis",
+      "label": "H Camelopardalis",
+      "x": -11.625,
+      "y": -164.84375,
+      "z": -296.46875,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 0.4
+    },
+    {
+      "id": "HR 2209",
+      "label": "HR 2209",
+      "x": -91.6875,
+      "y": 68.125,
+      "z": -132.59375,
+      "type": "anchor",
+      "role": "sky_anchor:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "weight": 0.4
+    },
+    {
+      "id": "Camelopardalis__VECTOR",
+      "label": "Giraffe Direction",
+      "x": -636.5352782608454,
+      "y": 220.4189491894658,
+      "z": -993.0953259217364,
+      "type": "vector",
+      "role": "sky_vector:Camelopardalis",
+      "constellation": "Camelopardalis",
+      "constellation_label": "Giraffe",
+      "anchors_used": [
+        "9 Alpha Camelopardalis",
+        "10 Beta Camelopardalis",
+        "Gamma Camelopardalis",
+        "CS Camelopardalis",
+        "43 Camelopardalis",
+        "16 Camelopardalis",
+        "H Camelopardalis",
+        "HR 2209"
+      ],
+      "vector_length_ly": 1200.0
+    },
+    {
+      "id": "Algol",
+      "label": "Algol",
+      "x": -45.75,
+      "y": -23.125,
+      "z": -77.40625,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 1.0
+    },
+    {
+      "id": "45 Epsilon Persei",
+      "label": "45 Epsilon Persei",
+      "x": -238.34375,
+      "y": -106.0,
+      "z": -582.59375,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.8
+    },
+    {
+      "id": "43 A Persei",
+      "label": "43 A Persei",
+      "x": -65.40625,
+      "y": -3.75,
+      "z": -115.875,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.7
+    },
+    {
+      "id": "35 Sigma Persei",
+      "label": "35 Sigma Persei",
+      "x": -184.78125,
+      "y": -39.75,
+      "z": -305.9375,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.6
+    },
+    {
+      "id": "21 Persei",
+      "label": "21 Persei",
+      "x": -136.21875,
+      "y": -126.34375,
+      "z": -260.28125,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.4
+    },
+    {
+      "id": "X Persei",
+      "label": "X Persei",
+      "x": -379.4375,
+      "y": -397.71875,
+      "z": -1280.9375,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.4
+    },
+    {
+      "id": "18 Tau Persei",
+      "label": "18 Tau Persei",
+      "x": -157.90625,
+      "y": -23.5625,
+      "z": -197.875,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.4
+    },
+    {
+      "id": "47 Lambda Persei",
+      "label": "47 Lambda Persei",
+      "x": -198.21875,
+      "y": -6.0625,
+      "z": -372.46875,
+      "type": "anchor",
+      "role": "sky_anchor:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "weight": 0.4
+    },
+    {
+      "id": "Perseus__VECTOR",
+      "label": "Hero Direction",
+      "x": -557.4438105546761,
+      "y": -202.12334253488808,
+      "z": -1043.2653317717438,
+      "type": "vector",
+      "role": "sky_vector:Perseus",
+      "constellation": "Perseus",
+      "constellation_label": "Hero",
+      "anchors_used": [
+        "Algol",
+        "45 Epsilon Persei",
+        "43 A Persei",
+        "35 Sigma Persei",
+        "21 Persei",
+        "X Persei",
+        "18 Tau Persei",
+        "47 Lambda Persei"
+      ],
+      "vector_length_ly": 1200.0
+    }
+  ],
+  "links": [
+    {
+      "source": "Maia",
+      "target": "Sol",
+      "kind": "reference_ray",
+      "label": "Sol \u2192 Maia"
+    },
+    {
+      "source": "Sol",
+      "target": "Schedar",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "Caph",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "Ruchbah",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "Segin",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "27 Gamma Cassiopeiae",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "Rho Cassiopeiae",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "Zeta Cassiopeiae",
+      "kind": "ray",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "Cassiopeia__VECTOR",
+      "kind": "vector",
+      "constellation": "Cassiopeia"
+    },
+    {
+      "source": "Sol",
+      "target": "9 Alpha Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "10 Beta Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "Gamma Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "CS Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "43 Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "16 Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "H Camelopardalis",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "HR 2209",
+      "kind": "ray",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "Camelopardalis__VECTOR",
+      "kind": "vector",
+      "constellation": "Camelopardalis"
+    },
+    {
+      "source": "Sol",
+      "target": "Algol",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "45 Epsilon Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "43 A Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "35 Sigma Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "21 Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "X Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "18 Tau Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "47 Lambda Persei",
+      "kind": "ray",
+      "constellation": "Perseus"
+    },
+    {
+      "source": "Sol",
+      "target": "Perseus__VECTOR",
+      "kind": "vector",
+      "constellation": "Perseus"
+    }
+  ],
+  "meta": {
+    "layer": "sky_ed",
+    "center": "Sol",
+    "vector_length_ly_default": 1200.0,
+    "radius": 12813.0,
+    "notes": "Sky layer uses real Elite Dangerous coordinates (x,y,z) from local catalogs. Constellation vectors are computed from anchor directions from Sol. References (e.g., Maia) are included as special nodes."
+  }
+}
