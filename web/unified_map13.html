@@ -1,0 +1,1888 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Unified Map — Corridors + Gravity Warp (Permit Toggles)</title>
+
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+    }
+  }
+  </script>
+
+  <style>
+    body { margin: 0; overflow: hidden; background: #000; color: #fff; font-family: sans-serif; }
+
+    #ui {
+      position: absolute; top: 10px; left: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,0.70);
+      padding: 10px 12px;
+      font-size: 12px;
+      border-radius: 10px;
+      width: 440px;
+      border: 1px solid rgba(255,255,255,0.10);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.35);
+      max-height: calc(100vh - 20px);
+      overflow: auto;
+    }
+
+    label { display: block; margin: 6px 0; user-select: none; }
+    input[type="range"] { width: 100%; }
+    select, input[type="text"], input[type="number"], input[type="color"] {
+      width: 100%;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: 8px;
+      padding: 6px;
+      box-sizing: border-box;
+    }
+
+    .row { margin-top: 8px; }
+    .tiny { opacity: 0.75; font-size: 11px; line-height: 1.25; }
+    .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    .grid3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .pill { display:inline-block; padding: 2px 7px; border:1px solid rgba(255,255,255,0.14); border-radius: 999px; font-size: 11px; opacity: 0.85; }
+    .sep { border-top:1px solid rgba(255,255,255,0.10); padding-top:8px; margin-top:10px; }
+
+    button {
+      width: 100%;
+      background: rgba(255,255,255,0.08);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 10px;
+      padding: 9px 10px;
+      cursor: pointer;
+    }
+    button:hover { background: rgba(255,255,255,0.12); }
+
+    #status { opacity: 0.95; margin-top: 10px; white-space: pre-line; line-height: 1.25; }
+
+    #tooltip {
+      position: absolute;
+      z-index: 20;
+      pointer-events: none;
+      background: rgba(0,0,0,0.82);
+      border: 1px solid rgba(255,255,255,0.16);
+      border-radius: 10px;
+      padding: 8px 10px;
+      font-size: 12px;
+      max-width: 560px;
+      display: none;
+      white-space: nowrap;
+    }
+    #tooltip .sub { opacity: 0.8; font-size: 11px; }
+    code { opacity: 0.9; }
+  </style>
+</head>
+
+<body>
+  <div id="ui">
+    <div>
+      <strong>Unified Map</strong>
+      <span class="pill">Corridors + Warp</span>
+      <span class="pill">Permit Toggles</span>
+    </div>
+
+    <label><input type="checkbox" id="toggleGuardian" checked /> Guardian Shell / Hotspots</label>
+
+    <label style="margin-bottom:0;"><input type="checkbox" id="toggleOmphalos" checked /> Omphalos (points)</label>
+
+    <!-- NEW: Omphalos permit filters -->
+    <div class="row tiny" style="border:1px solid rgba(255,255,255,0.10); border-radius:10px; padding:8px; margin-top:6px;">
+      <div style="margin-bottom:6px;"><strong>Omphalos Filters</strong> (permit)</div>
+
+      <label style="margin:4px 0;">
+        <input type="checkbox" id="toggleOmphalosOpen" checked />
+        Non-Permit / Open <span class="pill" id="omphalosOpenCount">0</span>
+      </label>
+
+      <label style="margin:4px 0;">
+        <input type="checkbox" id="toggleOmphalosPermit" checked />
+        Permit-Locked <span class="pill" id="omphalosPermitCount">0</span>
+      </label>
+
+      <div class="tiny" style="margin-top:6px;">
+        Uses <code>require_permit</code> (string/boolean) with fallbacks (<code>permit_name</code>, <code>category</code>).
+      </div>
+    </div>
+
+    <!-- NEW: Separate permit points layer (permit_points.json) -->
+    <label style="margin-top:8px; margin-bottom:0;">
+      <input type="checkbox" id="togglePermits" checked />
+      Permit-locked Systems (extracted points) <span class="pill" id="permitCount">0</span>
+    </label>
+    <div class="tiny" style="margin-top:4px;">
+      Uses <code>data/processed/permit_points.json</code> produced by <code>extract_coords_for_names.py</code>.
+    </div>
+
+    <label><input type="checkbox" id="toggleSky" checked /> Sky (ED Anchor Vectors)</label>
+
+    <div class="row sep">
+      <div><strong>Corridor Tube</strong></div>
+
+      <label><input type="checkbox" id="toggleCorridor" checked /> Show corridor + highlight inside systems</label>
+
+      <div class="row tiny">Corridor follows a selected Sky vector from Sol.</div>
+      <div class="row">
+        <div class="tiny">Corridor vector</div>
+        <select id="corridorVector">
+          <option value="none" selected>(loading…)</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Corridor length (ly)</div>
+        <input type="range" id="corridorLen" min="200" max="20000" step="100" value="6000" />
+        <div class="tiny">Length: <span id="corridorLenLabel">6000</span> ly</div>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Corridor radius (ly)</div>
+        <input type="range" id="corridorRad" min="10" max="800" step="5" value="120" />
+        <div class="tiny">Radius: <span id="corridorRadLabel">120</span> ly</div>
+      </div>
+
+      <div class="row grid2">
+        <button id="rebuildCorridorBtn">Rebuild Corridor</button>
+        <button id="clearHighlightBtn">Clear Highlight</button>
+      </div>
+    </div>
+
+    <div class="row sep">
+      <div><strong>Gravity Warp Mesh</strong></div>
+
+      <label><input type="checkbox" id="toggleWarp" checked /> Enable gravity warp (sources + grids)</label>
+      <label><input type="checkbox" id="toggleWarpLocal" checked /> Show local detailed warp</label>
+      <label><input type="checkbox" id="toggleWarpGlobal" checked /> Show global warp</label>
+
+      <div class="row tiny">
+        Visual proxy for gravity. <br>
+        <strong>Global:</strong> Uses Voxel-Capped auto-selection (optimized).<br>
+        <strong>Local:</strong> Uses manual selection or "Focus System".
+      </div>
+
+      <div class="row" style="border:1px solid rgba(255,255,255,0.10); border-radius:10px; padding:8px;">
+        <div class="tiny" style="margin-bottom:6px;"><strong>Focus System</strong> (uses omphalos_map.json)</div>
+        <div class="row">
+          <div class="tiny">System name (exact or partial)</div>
+          <input id="focusSystem" type="text" placeholder="Maia" />
+        </div>
+        <div class="row grid3">
+          <div>
+            <div class="tiny">Nearest N</div>
+            <input id="focusN" type="number" min="1" max="50" value="8" />
+          </div>
+          <div>
+            <div class="tiny">Max radius (ly)</div>
+            <input id="focusRadius" type="number" min="0" max="20000" value="0" />
+          </div>
+          <div>
+            <div class="tiny">Local size (ly)</div>
+            <input id="focusLocalSize" type="number" min="100" max="20000" value="1200" />
+          </div>
+        </div>
+        <div class="row grid2">
+          <button id="focusSystemBtn">Select + Warp at System</button>
+          <button id="clearFocusBtn">Clear Focus</button>
+        </div>
+        <div class="row tiny">Tip: set radius=0 to ignore radius and just pick nearest N.</div>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Search gravity sources (filters list)</div>
+        <input id="gravSearch" type="text" placeholder="type to filter (e.g., neutron, white dwarf, HR 7466)"/>
+      </div>
+
+      <div class="row">
+        <div class="tiny">Gravity sources (manual multi-select)</div>
+        <select id="gravSelect" size="8" multiple></select>
+      </div>
+
+      <div class="row grid2">
+        <div>
+          <div class="tiny">Local grid color</div>
+          <input id="warpColorLocal" type="color" value="#00ffff" />
+        </div>
+        <div>
+          <div class="tiny">Global grid color</div>
+          <input id="warpColorGlobal" type="color" value="#4444ff" />
+        </div>
+      </div>
+
+      <div class="row" style="border:1px solid rgba(255,255,255,0.10); border-radius:10px; padding:8px;">
+        <div class="tiny" style="margin-bottom:6px;"><strong>Deviation Coloring (Heat)</strong></div>
+        <label><input type="checkbox" id="toggleWarpHeat" checked /> Color “deviating” segments hotter</label>
+        <div class="row grid2">
+          <div>
+            <div class="tiny">Hot color</div>
+            <input id="warpHeatColor" type="color" value="#ffcc00" />
+          </div>
+          <div>
+            <div class="tiny">Heat sensitivity</div>
+            <input id="warpHeatPivot" type="range" min="0.10" max="1.20" step="0.02" value="0.60" />
+            <div class="tiny">Pivot: <span id="warpHeatPivotLabel">0.60</span></div>
+          </div>
+        </div>
+        <div class="tiny">
+          Pivot controls when segments “light up”. Lower = hotter sooner.
+        </div>
+      </div>
+
+      <div class="row grid2">
+        <div>
+          <div class="tiny">Warp strength</div>
+          <input type="range" id="warpStrength" min="0" max="1" step="0.02" value="0.35" />
+          <div class="tiny">Strength: <span id="warpStrengthLabel">0.35</span></div>
+        </div>
+        <div>
+          <div class="tiny">Warp softening</div>
+          <input type="range" id="warpSoft" min="5" max="500" step="5" value="60" />
+          <div class="tiny">Softening: <span id="warpSoftLabel">60</span> ly</div>
+        </div>
+      </div>
+
+      <div class="row grid2">
+        <div>
+          <div class="tiny">Local grid half-size</div>
+          <input type="range" id="warpSize" min="200" max="20000" step="100" value="1200" />
+          <div class="tiny">Size: ±<span id="warpSizeLabel">1200</span> ly</div>
+        </div>
+        <div>
+          <div class="tiny">Local grid density</div>
+          <input type="range" id="warpDiv" min="4" max="24" step="1" value="10" />
+          <div class="tiny">Div: <span id="warpDivLabel">10</span></div>
+        </div>
+      </div>
+
+      <div class="row sep">
+        <div class="tiny"><strong>Global Grid Controls</strong> (Optimized Slice)</div>
+
+        <div class="row grid3">
+          <button id="presetBalanced" title="Detailed slice, safe">RTX 3060 (Balanced)</button>
+          <button id="presetUltra" title="Very detailed slice, heavier">RTX 4090 (Ultra)</button>
+          <button id="presetTexture" title="Texture-rich warp">TITAN (Texture)</button>
+        </div>
+
+        <div class="row">
+          <div class="tiny">Global half-size (ly) override (0 = auto)</div>
+          <input id="globalHalfOverride" type="number" min="0" max="300000" value="0" />
+        </div>
+
+        <div class="row">
+          <div class="tiny">Global half-size scale (used only when override = 0)</div>
+          <input type="range" id="globalHalfScale" min="0.05" max="1.50" step="0.01" value="1.05" />
+          <div class="tiny">Half-size scale: <span id="globalHalfScaleLabel">1.05</span>×</div>
+        </div>
+
+        <div class="row grid2">
+          <div>
+            <div class="tiny">Global divisions</div>
+            <input type="range" id="globalDiv" min="3" max="120" step="1" value="40" />
+            <div class="tiny">Div: <span id="globalDivLabel">40</span></div>
+          </div>
+          <div>
+            <div class="tiny">Segments per line</div>
+            <input type="range" id="globalSteps" min="2" max="60" step="1" value="12" />
+            <div class="tiny">Steps: <span id="globalStepsLabel">12</span></div>
+          </div>
+        </div>
+
+        <div class="row grid2">
+          <div>
+            <div class="tiny">Global opacity</div>
+            <input type="range" id="globalOpacity" min="0" max="1" step="0.02" value="0.55" />
+            <div class="tiny">Opacity: <span id="globalOpacityLabel">0.55</span></div>
+          </div>
+          <div>
+            <div class="tiny">Global strength scale</div>
+            <input type="range" id="globalStrengthScale" min="0" max="1" step="0.02" value="0.25" />
+            <div class="tiny">Scale: <span id="globalStrengthScaleLabel">0.25</span></div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="tiny">Global max displacement (ratio of half-size)</div>
+          <input type="range" id="globalMaxDispRatio" min="0.002" max="0.15" step="0.001" value="0.04" />
+          <div class="tiny">MaxDisp ratio: <span id="globalMaxDispRatioLabel">0.040</span></div>
+        </div>
+
+        <div class="row">
+          <div class="tiny">Global grid mode</div>
+          <select id="globalMode">
+            <option value="cube">Cube (XYZ)</option>
+            <option value="xy" selected>Slice: XY (Top Down)</option>
+            <option value="xz">Slice: XZ (Front)</option>
+            <option value="yz">Slice: YZ (Side)</option>
+          </select>
+          <div class="tiny">Slice mode is highly optimized.</div>
+        </div>
+
+        <div class="row tiny" id="globalCellInfo">Cell size: (calc…)</div>
+      </div>
+
+      <div class="row sep">
+        <div><strong>Global Sources</strong> <span class="pill">Voxel-Capped Auto</span></div>
+
+        <label><input type="checkbox" id="toggleAutoGlobal" checked /> Auto-pick global sources</label>
+
+        <div class="row grid3">
+          <div>
+            <div class="tiny">Voxel size (ly)</div>
+            <input id="autoVoxel" type="number" min="50" max="5000" value="1000" />
+          </div>
+          <div>
+            <div class="tiny">Cap per voxel</div>
+            <input id="autoPerVoxel" type="number" min="1" max="10" value="1" />
+          </div>
+          <div>
+            <div class="tiny">Total global K</div>
+            <input id="autoK" type="number" min="10" max="2000" value="180" />
+          </div>
+        </div>
+
+        <div class="row grid2">
+          <div>
+            <div class="tiny">Weight exponent</div>
+            <input type="range" id="autoWeightExp" min="0.25" max="2.5" step="0.05" value="1.0" />
+            <div class="tiny">Exp: <span id="autoWeightExpLabel">1.00</span></div>
+          </div>
+          <div>
+            <div class="tiny">Kinds used</div>
+            <select id="autoKinds" multiple size="3">
+              <option value="BH" selected>BH</option>
+              <option value="NS" selected>NS</option>
+              <option value="WD" selected>WD</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="row grid2">
+          <button id="rebuildAutoGlobalBtn">Recompute Auto Global Sources</button>
+          <button id="useAutoAsSelectionBtn" title="Copies auto set into the manual selection list">Copy Auto → Selected</button>
+        </div>
+
+        <div class="row tiny" id="autoGlobalStats">Auto set: (loading…)</div>
+      </div>
+
+      <div class="row grid2">
+        <button id="rebuildWarpBtn">Rebuild Warp Grid</button>
+        <button id="focusSelectedBtn">Focus Selected</button>
+      </div>
+
+      <div class="row grid2">
+        <button id="resetViewBtn">Reset View</button>
+        <button id="savePngBtn" title="Downloads a snapshot of the canvas">Save PNG</button>
+      </div>
+
+      <div class="row tiny">
+        Shortcuts: <code>R</code>=rebuild warp, <code>C</code>=rebuild corridor, <code>H</code>=toggle heat, <code>V</code>=focus
+      </div>
+    </div>
+
+    <div id="status">Loading…</div>
+    <div class="row tiny" style="margin-top:10px;">
+      Open: <code>http://localhost:8000/web/unified_map12_permits.html</code><br/>
+      Serve from project root: <code>python -m http.server 8000</code>
+    </div>
+  </div>
+
+  <div id="tooltip"></div>
+
+  <script type="module">
+    import * as THREE from "three";
+    import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+
+    // ---- Paths ----
+    const PATHS = {
+      guardian: "../data/processed/guardian_map.json",
+      omphalos: "../data/processed/omphalos_map.json",
+      sky:      "../data/processed/sky_ed.json",
+      gravityFull: "../data/processed/gravity_sources_full.json",
+      gravity:  "../data/processed/gravity_sources.json",
+      permit:   "../data/processed/permit_points.json"
+    };
+
+    // ---------- DOM ----------
+    const $ = (id) => document.getElementById(id);
+
+    const statusEl = $("status");
+    const tooltip = $("tooltip");
+
+    const toggleGuardian = $("toggleGuardian");
+    const toggleOmphalos = $("toggleOmphalos");
+    const togglePermits  = $("togglePermits");
+    const permitCount    = $("permitCount");
+    const toggleSky = $("toggleSky");
+
+    // NEW: Omphalos permit toggles
+    const toggleOmphalosOpen = $("toggleOmphalosOpen");
+    const toggleOmphalosPermit = $("toggleOmphalosPermit");
+    const omphalosOpenCount = $("omphalosOpenCount");
+    const omphalosPermitCount = $("omphalosPermitCount");
+
+    const toggleCorridor = $("toggleCorridor");
+    const corridorVector = $("corridorVector");
+    const corridorLen = $("corridorLen");
+    const corridorLenLabel = $("corridorLenLabel");
+    const corridorRad = $("corridorRad");
+    const corridorRadLabel = $("corridorRadLabel");
+    const rebuildCorridorBtn = $("rebuildCorridorBtn");
+    const clearHighlightBtn = $("clearHighlightBtn");
+
+    const toggleWarp = $("toggleWarp");
+    const toggleWarpLocal = $("toggleWarpLocal");
+    const toggleWarpGlobal = $("toggleWarpGlobal");
+
+    const focusSystem = $("focusSystem");
+    const focusN = $("focusN");
+    const focusRadius = $("focusRadius");
+    const focusLocalSize = $("focusLocalSize");
+    const focusSystemBtn = $("focusSystemBtn");
+    const clearFocusBtn = $("clearFocusBtn");
+
+    const gravSearch = $("gravSearch");
+    const gravSelect = $("gravSelect");
+
+    const warpStrength = $("warpStrength");
+    const warpStrengthLabel = $("warpStrengthLabel");
+    const warpSoft = $("warpSoft");
+    const warpSoftLabel = $("warpSoftLabel");
+    const warpSize = $("warpSize");
+    const warpSizeLabel = $("warpSizeLabel");
+    const warpDiv = $("warpDiv");
+    const warpDivLabel = $("warpDivLabel");
+    const rebuildWarpBtn = $("rebuildWarpBtn");
+    const focusSelectedBtn = $("focusSelectedBtn");
+
+    const warpColorLocal = $("warpColorLocal");
+    const warpColorGlobal = $("warpColorGlobal");
+
+    // Deviation heat
+    const toggleWarpHeat = $("toggleWarpHeat");
+    const warpHeatColor = $("warpHeatColor");
+    const warpHeatPivot = $("warpHeatPivot");
+    const warpHeatPivotLabel = $("warpHeatPivotLabel");
+
+    // Global grid controls
+    const globalHalfOverride = $("globalHalfOverride");
+    const globalHalfScale = $("globalHalfScale");
+    const globalHalfScaleLabel = $("globalHalfScaleLabel");
+    const globalDivCtrl = $("globalDiv");
+    const globalDivLabel = $("globalDivLabel");
+    const globalStepsCtrl = $("globalSteps");
+    const globalStepsLabel = $("globalStepsLabel");
+    const globalOpacity = $("globalOpacity");
+    const globalOpacityLabel = $("globalOpacityLabel");
+    const globalStrengthScale = $("globalStrengthScale");
+    const globalStrengthScaleLabel = $("globalStrengthScaleLabel");
+    const globalMaxDispRatio = $("globalMaxDispRatio");
+    const globalMaxDispRatioLabel = $("globalMaxDispRatioLabel");
+    const globalMode = $("globalMode");
+    const globalCellInfo = $("globalCellInfo");
+
+    // GPU presets
+    const presetBalanced = $("presetBalanced");
+    const presetUltra = $("presetUltra");
+    const presetTexture = $("presetTexture");
+
+    // Voxel-capped auto global
+    const toggleAutoGlobal = $("toggleAutoGlobal");
+    const autoVoxel = $("autoVoxel");
+    const autoPerVoxel = $("autoPerVoxel");
+    const autoK = $("autoK");
+    const autoWeightExp = $("autoWeightExp");
+    const autoWeightExpLabel = $("autoWeightExpLabel");
+    const autoKinds = $("autoKinds");
+    const rebuildAutoGlobalBtn = $("rebuildAutoGlobalBtn");
+    const useAutoAsSelectionBtn = $("useAutoAsSelectionBtn");
+    const autoGlobalStats = $("autoGlobalStats");
+
+    // View
+    const resetViewBtn = $("resetViewBtn");
+    const savePngBtn = $("savePngBtn");
+
+    function setStatus(lines) {
+      const text = Array.isArray(lines) ? lines.join("\n") : String(lines ?? "");
+      if (statusEl) statusEl.textContent = text;
+      else console.warn("Status:", text);
+    }
+
+    function appendStatus(line) {
+      const cur = (statusEl?.textContent || "").trim();
+      setStatus(cur ? (cur + "\n" + line) : line);
+    }
+
+    function clamp01(x){ return Math.max(0, Math.min(1, x)); }
+    function smoothstep01(t){ t = clamp01(t); return t * t * (3 - 2 * t); }
+
+    // ---------- JSON ----------
+    async function loadJSON(url) {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) throw new Error(`HTTP ${r.status} for ${url}`);
+      return r.json();
+    }
+    async function tryLoadJSON(url) {
+      const r = await fetch(url, { cache: "no-store" });
+      if (!r.ok) return null;
+      return r.json();
+    }
+
+    // ---------- THREE ----------
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x000000);
+
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 8_000_000);
+    camera.position.set(0, 0, 900);
+
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
+
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.minDistance = 10;
+    controls.maxDistance = 4_000_000;
+
+    scene.add(new THREE.AmbientLight(0xffffff, 0.30));
+    const dirLight = new THREE.DirectionalLight(0xffffff, 0.55);
+    dirLight.position.set(1, 1, 1);
+    scene.add(dirLight);
+
+    const guardianGroup = new THREE.Group();
+    const omphalosGroup = new THREE.Group();
+    const permitGroup   = new THREE.Group();
+    const skyGroup = new THREE.Group();
+    const corridorGroup = new THREE.Group();
+    const gravityGroup = new THREE.Group();
+    const warpLocalGroup = new THREE.Group();
+    const warpGlobalGroup = new THREE.Group();
+
+    scene.add(guardianGroup, omphalosGroup, permitGroup, skyGroup, corridorGroup, gravityGroup, warpLocalGroup, warpGlobalGroup);
+
+    // ---------- Materials ----------
+    const nodeGeometry = new THREE.SphereGeometry(2, 12, 12);
+    const skyNodeGeometry = new THREE.SphereGeometry(4, 14, 14);
+    const skyOriginGeometry = new THREE.SphereGeometry(6, 16, 16);
+    const skyVectorGeometry = new THREE.ConeGeometry(7, 18, 16);
+    const gravityMarkerGeo = new THREE.SphereGeometry(5, 14, 14);
+
+    const guardianNodeMaterial = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+    const centerMaterial = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+    const skyConstMaterial  = new THREE.MeshBasicMaterial({ color: 0xff66cc });
+    const skyOriginMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    const skyVectorMaterial = new THREE.MeshBasicMaterial({ color: 0xffaa00 });
+
+    const guardianLineMaterial = new THREE.LineBasicMaterial({ color: 0x007700, transparent: true, opacity: 0.60 });
+    const skyRayMaterial       = new THREE.LineBasicMaterial({ color: 0x666666, transparent: true, opacity: 0.35 });
+    const skyVectorLineMat     = new THREE.LineBasicMaterial({ color: 0xffaa00, transparent: true, opacity: 0.85 });
+
+    const corridorTubeMaterial = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.10 });
+    const corridorAxisMaterial = new THREE.LineBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.35 });
+
+    const gravityMarkerMat = new THREE.MeshBasicMaterial({ color: 0xaa66ff });
+
+    // FIXED: Material color must be White so Vertex Colors display correctly.
+    const warpLineMatLocal = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.98,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      depthWrite: false
+    });
+
+    const warpLineMatGlobal = new THREE.LineBasicMaterial({
+      color: 0xffffff,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.55,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      depthWrite: false
+    });
+
+    const omphalosPointsMat = new THREE.PointsMaterial({
+      size: 2.0,
+      vertexColors: true,
+      transparent: true,
+      opacity: 0.95,
+      sizeAttenuation: true
+    });
+
+    // NEW: Permit points material (permit_points.json)
+    const permitPointsMat = new THREE.PointsMaterial({
+      size: 3.0,
+      color: 0xff4444,
+      transparent: true,
+      opacity: 0.95,
+      sizeAttenuation: true
+    });
+
+    // ---------- Data state ----------
+    let omphalosData = null;
+    let skyData = null;
+    let gravityData = null;
+
+    const skyVectors = new Map();
+
+    // NEW: two clouds + attrs (omphalos)
+    let omphalosSystemsAll = [];
+    let omphalosOpen = { systems: [], points: null, colorAttr: null, base: new THREE.Color(0x00ffff) };
+    let omphalosPermit = { systems: [], points: null, colorAttr: null, base: new THREE.Color(0xff3b3b) };
+
+    // NEW: permit_points.json state
+    let permitSystems = [];
+    let permitPoints = null;
+
+    let corridorTubeMesh = null;
+    let corridorAxisLine = null;
+
+    let gravitySources = [];
+    var gravityExtents = null;
+
+    let focusCenter = null;
+
+    let selectedGravityIds = new Set();
+    const systemIndex = new Map();
+
+    let autoGlobalSources = [];
+    let autoGlobalMeta = { voxels: 0, selected: 0, usedKinds: [] };
+
+    // ---------- Helpers ----------
+    function clearGroup(group, disposeMaterials = false) {
+      const kill = [];
+      group.traverse(o => kill.push(o));
+      for (const o of kill) {
+        if (o.geometry) o.geometry.dispose?.();
+        if (disposeMaterials && o.material) {
+          if (Array.isArray(o.material)) o.material.forEach(m => m.dispose?.());
+          else o.material.dispose?.();
+        }
+      }
+      while (group.children.length) group.remove(group.children[0]);
+    }
+
+    function parseBoolish(v) {
+      if (typeof v === "boolean") return v;
+      if (typeof v === "number") return v !== 0;
+      if (typeof v !== "string") return false;
+      const t = v.trim().toLowerCase();
+      if (t === "true" || t === "1" || t === "yes" || t === "y") return true;
+      if (t === "false" || t === "0" || t === "no" || t === "n" || t === "") return false;
+      return false;
+    }
+
+    function isPermitLockedRecord(s) {
+      // Primary: require_permit (string/bool)
+      const rp = s?.require_permit;
+      const byRequire = parseBoolish(rp);
+      if (byRequire) return true;
+
+      // Fallback: permit_name non-empty
+      const pn = String(s?.permit_name || "").trim();
+      if (pn) return true;
+
+      // Fallback: category contains "permit"
+      const cat = String(s?.category || "").toLowerCase();
+      if (cat.includes("permit")) return true;
+
+      return false;
+    }
+
+    function setOmphalosCounts() {
+      if (omphalosOpenCount) omphalosOpenCount.textContent = String(omphalosOpen.systems.length);
+      if (omphalosPermitCount) omphalosPermitCount.textContent = String(omphalosPermit.systems.length);
+    }
+
+    function setPermitCount() {
+      if (permitCount) permitCount.textContent = String(permitSystems.length || 0);
+    }
+
+    function syncOmphalosVisibility() {
+      const master = !!toggleOmphalos?.checked;
+      const showOpen = !!toggleOmphalosOpen?.checked;
+      const showPermit = !!toggleOmphalosPermit?.checked;
+
+      if (omphalosOpen.points) omphalosOpen.points.visible = master && showOpen;
+      if (omphalosPermit.points) omphalosPermit.points.visible = master && showPermit;
+
+      omphalosGroup.visible = master;
+    }
+
+    function syncPermitVisibility() {
+      permitGroup.visible = !!togglePermits?.checked;
+    }
+
+    function updateGlobalCellInfo() {
+      if (!globalCellInfo) return;
+      if (!gravityExtents) { globalCellInfo.textContent = "Cell size: (needs gravity extents)"; return; }
+
+      const maxAbs = gravityExtents.maxAbs;
+      const halfOverride = Number(globalHalfOverride?.value ?? 0);
+      const halfScale = Number(globalHalfScale?.value ?? 1.05);
+
+      const half = (halfOverride > 0) ? halfOverride : Math.max(2000, maxAbs * halfScale);
+      const div = Math.max(1, Number(globalDivCtrl?.value ?? 8));
+
+      const cell = (2 * half) / div;
+      globalCellInfo.textContent = `Cell size ≈ ${cell.toFixed(0)} ly  (half=${half.toFixed(0)} ly, div=${div})`;
+    }
+
+    function syncLabels() {
+      corridorLenLabel.textContent = `${Number(corridorLen.value).toFixed(0)}`;
+      corridorRadLabel.textContent = `${Number(corridorRad.value).toFixed(0)}`;
+
+      warpStrengthLabel.textContent = `${Number(warpStrength.value).toFixed(2)}`;
+      warpSoftLabel.textContent = `${Number(warpSoft.value).toFixed(0)}`;
+      warpSizeLabel.textContent = `${Number(warpSize.value).toFixed(0)}`;
+      warpDivLabel.textContent = `${Number(warpDiv.value).toFixed(0)}`;
+
+      globalHalfScaleLabel.textContent = `${Number(globalHalfScale.value).toFixed(2)}`;
+      globalDivLabel.textContent = `${Number(globalDivCtrl.value).toFixed(0)}`;
+      globalStepsLabel.textContent = `${Number(globalStepsCtrl.value).toFixed(0)}`;
+      globalOpacityLabel.textContent = `${Number(globalOpacity.value).toFixed(2)}`;
+      globalStrengthScaleLabel.textContent = `${Number(globalStrengthScale.value).toFixed(2)}`;
+      globalMaxDispRatioLabel.textContent = `${Number(globalMaxDispRatio.value).toFixed(3)}`;
+
+      autoWeightExpLabel.textContent = `${Number(autoWeightExp.value).toFixed(2)}`;
+      warpHeatPivotLabel.textContent = `${Number(warpHeatPivot.value).toFixed(2)}`;
+
+      updateGlobalCellInfo();
+    }
+
+    [
+      corridorLen, corridorRad,
+      warpStrength, warpSoft, warpSize, warpDiv,
+      globalHalfOverride, globalHalfScale, globalDivCtrl, globalStepsCtrl, globalOpacity, globalStrengthScale, globalMaxDispRatio, globalMode,
+      autoWeightExp,
+      warpHeatPivot
+    ].forEach(el => el?.addEventListener("input", syncLabels));
+    syncLabels();
+
+    // ---------- Permit Points Layer ----------
+    function buildPermitPoints(rows) {
+      clearGroup(permitGroup);
+      permitSystems = (rows || []).map(s => ({
+        name: String(s?.name || s?.systemName || s?.system || ""),
+        x: Number(s?.x || 0),
+        y: Number(s?.y || 0),
+        z: Number(s?.z || 0),
+        // keep any extra fields if present
+        permit: s?.permit || s?.permit_name || s?.permitName || null
+      }));
+
+      const n = permitSystems.length;
+      const pos = new Float32Array(n * 3);
+
+      for (let i = 0; i < n; i++) {
+        const s = permitSystems[i];
+        pos[i*3+0] = s.x;
+        pos[i*3+1] = s.z;  // render transform: (x, z, y)
+        pos[i*3+2] = s.y;
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+      geo.computeBoundingSphere?.();
+
+      permitPoints = new THREE.Points(geo, permitPointsMat);
+      permitPoints.userData = { __layer: "permits", role: "permit:points", id: "PERMIT_POINTS", label: "Permit-locked Systems (extracted)" };
+      permitGroup.add(permitPoints);
+
+      setPermitCount();
+      syncPermitVisibility();
+    }
+
+    // ---------- GPU Presets ----------
+    async function applyPreset(p) {
+      globalDivCtrl.value = String(p.globalDiv);
+      globalStepsCtrl.value = String(p.globalSteps);
+      if (p.globalHalfOverride != null) globalHalfOverride.value = String(p.globalHalfOverride);
+      if (p.globalMode != null) globalMode.value = p.globalMode;
+      autoVoxel.value = String(p.voxel);
+      autoPerVoxel.value = String(p.perVoxel);
+      autoK.value = String(p.K);
+      syncLabels();
+      if (toggleAutoGlobal?.checked) await recomputeAutoGlobalSources();
+      rebuildWarpGrids();
+      appendStatus(`Preset applied: ${p.name}`);
+    }
+
+    presetBalanced?.addEventListener("click", () => applyPreset({
+      name: "RTX 3060 (Balanced)",
+      globalDiv: 45, globalSteps: 14, voxel: 1200, perVoxel: 1, K: 180, globalMode: "xy", globalHalfOverride: 0
+    }));
+
+    presetUltra?.addEventListener("click", () => applyPreset({
+      name: "RTX 4090 (Ultra)",
+      globalDiv: 60, globalSteps: 12, voxel: 1500, perVoxel: 1, K: 140, globalMode: "xy", globalHalfOverride: 0
+    }));
+
+    presetTexture?.addEventListener("click", () => applyPreset({
+      name: "TITAN (Texture)",
+      globalDiv: 35, globalSteps: 18, voxel: 750, perVoxel: 2, K: 280, globalMode: "xy", globalHalfOverride: 0
+    }));
+
+    // ---------- Layers ----------
+    function addLayerNodesLinks(group, data, layerName) {
+      const nodes = data.nodes || [];
+      const links = data.links || [];
+      const centerName = (data.meta && data.meta.center) ? data.meta.center : null;
+      const nodeIndex = {};
+      for (const n of nodes) nodeIndex[n.id] = n;
+
+      for (const n of nodes) {
+        let mesh = null;
+        if (layerName === "guardian") {
+          const mat = (centerName && n.id === centerName) ? centerMaterial : guardianNodeMaterial;
+          mesh = new THREE.Mesh(nodeGeometry, mat);
+        } else if (layerName === "sky") {
+          if (n.type === "origin") mesh = new THREE.Mesh(skyOriginGeometry, skyOriginMaterial);
+          else if (n.type === "vector") mesh = new THREE.Mesh(skyVectorGeometry, skyVectorMaterial);
+          else mesh = new THREE.Mesh(skyNodeGeometry, skyConstMaterial);
+        }
+        if (!mesh) continue;
+        mesh.position.set(n.x || 0, n.z || 0, n.y || 0);
+        mesh.userData = { ...n, __layer: layerName };
+        group.add(mesh);
+
+        if (layerName === "sky" && n.type === "vector") {
+          const outward = mesh.position.clone().normalize();
+          mesh.lookAt(outward.clone().multiplyScalar(1000));
+        }
+      }
+
+      for (const l of links) {
+        const a = nodeIndex[l.source];
+        const b = nodeIndex[l.target];
+        if (!a || !b) continue;
+        const pts = [ new THREE.Vector3(a.x || 0, a.z || 0, a.y || 0), new THREE.Vector3(b.x || 0, b.z || 0, b.y || 0) ];
+        const geometry = new THREE.BufferGeometry().setFromPoints(pts);
+        let mat = null;
+        if (layerName === "guardian") mat = guardianLineMaterial;
+        else if (layerName === "sky") mat = (l.kind === "vector") ? skyVectorLineMat : skyRayMaterial;
+        const line = new THREE.Line(geometry, mat);
+        line.userData = { __layer: layerName, __isLine: true, ...l };
+        group.add(line);
+      }
+    }
+
+    // build two point clouds (open vs permit) for omphalos_map.json
+    function buildOmphalosPointsTwoClouds(systems) {
+      clearGroup(omphalosGroup);
+
+      omphalosSystemsAll = systems.map(s => ({
+        name: String(s?.name || ""),
+        x: Number(s?.x || 0),
+        y: Number(s?.y || 0),
+        z: Number(s?.z || 0),
+        require_permit: s?.require_permit,
+        permit_name: String(s?.permit_name || ""),
+        category: String(s?.category || ""),
+        tags: String(s?.tags || ""),
+        poi_count: Number(s?.poi_count || 0),
+        distance_to_sol: Number(s?.distance_to_sol || 0)
+      }));
+
+      omphalosOpen.systems = [];
+      omphalosPermit.systems = [];
+
+      for (const s of omphalosSystemsAll) {
+        if (isPermitLockedRecord(s)) omphalosPermit.systems.push(s);
+        else omphalosOpen.systems.push(s);
+      }
+
+      function makePointsBundle(bundle, keyName) {
+        const arr = bundle.systems;
+        const n = arr.length;
+
+        const pos = new Float32Array(n * 3);
+        const col = new Float32Array(n * 3);
+
+        for (let i = 0; i < n; i++) {
+          const s = arr[i];
+          // render transform: (x, z, y)
+          pos[i*3+0] = s.x;
+          pos[i*3+1] = s.z;
+          pos[i*3+2] = s.y;
+
+          col[i*3+0] = bundle.base.r;
+          col[i*3+1] = bundle.base.g;
+          col[i*3+2] = bundle.base.b;
+        }
+
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute("position", new THREE.BufferAttribute(pos, 3));
+        bundle.colorAttr = new THREE.BufferAttribute(col, 3);
+        geo.setAttribute("color", bundle.colorAttr);
+        geo.computeBoundingSphere?.();
+
+        bundle.points = new THREE.Points(geo, omphalosPointsMat);
+        bundle.points.userData = {
+          __layer: "omphalos",
+          role: "omphalos:points",
+          groupKey: keyName
+        };
+        omphalosGroup.add(bundle.points);
+      }
+
+      makePointsBundle(omphalosOpen, "open");
+      makePointsBundle(omphalosPermit, "permit");
+
+      setOmphalosCounts();
+      syncOmphalosVisibility();
+    }
+
+    function indexSystemsForFocus() {
+      systemIndex.clear();
+      for (const s of omphalosSystemsAll) {
+        const key = (s.name || "").trim().toLowerCase();
+        if (key) systemIndex.set(key, { name: s.name, x: s.x, y: s.y, z: s.z });
+      }
+    }
+
+    function clearOmphalosHighlight() {
+      // reset both clouds back to their base colors
+      function resetBundle(bundle) {
+        if (!bundle.colorAttr) return;
+        for (let i = 0; i < bundle.colorAttr.count; i++) {
+          bundle.colorAttr.setXYZ(i, bundle.base.r, bundle.base.g, bundle.base.b);
+        }
+        bundle.colorAttr.needsUpdate = true;
+      }
+      resetBundle(omphalosOpen);
+      resetBundle(omphalosPermit);
+    }
+
+    function populateCorridorVectors() {
+      corridorVector.innerHTML = "";
+      const keys = Array.from(skyVectors.keys()).sort();
+      if (!keys.length) {
+        const opt = document.createElement("option");
+        opt.value = "none";
+        opt.textContent = "(no sky vectors)";
+        corridorVector.appendChild(opt);
+        return;
+      }
+      for (const k of keys) {
+        const opt = document.createElement("option");
+        opt.value = k;
+        opt.textContent = k;
+        corridorVector.appendChild(opt);
+      }
+    }
+
+    function getSelectedSkyDir() {
+      const name = corridorVector.value;
+      const v = skyVectors.get(name);
+      if (!v) return null;
+      const len2 = v.lengthSq();
+      if (len2 < 1e-12) return null;
+      return v.clone().normalize();
+    }
+
+    // ---------- Corridor ----------
+    function rebuildCorridor() {
+      clearGroup(corridorGroup);
+      corridorTubeMesh = null;
+      corridorAxisLine = null;
+
+      // always clear highlight (even if corridor hidden)
+      clearOmphalosHighlight();
+
+      if (!toggleCorridor.checked || !toggleOmphalos.checked) return;
+
+      const dir = getSelectedSkyDir();
+      if (!dir) return;
+
+      const len = Number(corridorLen.value);
+      const rad = Number(corridorRad.value);
+      const p0 = new THREE.Vector3(0,0,0);
+      const p1 = dir.clone().multiplyScalar(len);
+
+      const axisPts = [ new THREE.Vector3(p0.x, p0.z, p0.y), new THREE.Vector3(p1.x, p1.z, p1.y) ];
+      corridorAxisLine = new THREE.Line(
+        new THREE.BufferGeometry().setFromPoints(axisPts),
+        corridorAxisMaterial
+      );
+      corridorAxisLine.userData = { __layer: "corridor", id: "CORRIDOR_AXIS", label: "Corridor Axis", role: "analysis:corridor_axis" };
+      corridorGroup.add(corridorAxisLine);
+
+      const curve = new THREE.LineCurve3(p0, p1);
+      const tubeGeo = new THREE.TubeGeometry(curve, 80, rad, 16, false);
+      corridorTubeMesh = new THREE.Mesh(tubeGeo, corridorTubeMaterial);
+      const posAttr = corridorTubeMesh.geometry.getAttribute("position");
+      for (let i = 0; i < posAttr.count; i++) {
+        const x = posAttr.getX(i);
+        const y = posAttr.getY(i);
+        const z = posAttr.getZ(i);
+        posAttr.setXYZ(i, x, z, y);
+      }
+      posAttr.needsUpdate = true;
+      corridorTubeMesh.geometry.computeBoundingSphere?.();
+      corridorTubeMesh.userData = { __layer: "corridor", id: "CORRIDOR_TUBE", label: "Corridor Tube", role: "analysis:corridor_tube", length_ly: len, radius_ly: rad };
+      corridorGroup.add(corridorTubeMesh);
+
+      // highlight inside corridor across BOTH clouds
+      const hiR = 1.0, hiG = 0.93, hiB = 0.40;
+
+      function highlightBundle(bundle) {
+        if (!bundle.systems.length || !bundle.colorAttr) return;
+        for (let i = 0; i < bundle.systems.length; i++) {
+          const s = bundle.systems[i];
+          const t = (s.x * dir.x) + (s.y * dir.y) + (s.z * dir.z);
+          if (t < 0 || t > len) continue;
+          const cx = dir.x * t; const cy = dir.y * t; const cz = dir.z * t;
+          const dx = s.x - cx; const dy = s.y - cy; const dz = s.z - cz;
+          const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+          if (d <= rad) bundle.colorAttr.setXYZ(i, hiR, hiG, hiB);
+        }
+        bundle.colorAttr.needsUpdate = true;
+      }
+
+      highlightBundle(omphalosOpen);
+      highlightBundle(omphalosPermit);
+    }
+
+    // ---------- Gravity UI / Selection ----------
+    function labelForSource(s) {
+      const kind = s.kind || "body";
+      const sys = s.system || "?";
+      const body = s.body_name || s.id || "?";
+      const m = (typeof s.mass_msol === "number") ? s.mass_msol : null;
+      const w = (typeof s.weight === "number") ? s.weight : (m != null ? m : null);
+      const wtxt = (w != null) ? w.toFixed(2) : "?";
+      const mtxt = (m != null) ? `, M=${m.toFixed(2)}Msun` : "";
+      return `[${kind}] ${sys} — ${body} (w=${wtxt}${mtxt})`;
+    }
+
+    function rebuildGravitySelect(filterText = "") {
+      const q = (filterText || "").trim().toLowerCase();
+      const filtered = gravitySources.filter(s => {
+        if (!q) return true;
+        const hay = `${s.kind||""} ${s.system||""} ${s.body_name||""} ${s.subType||""}`.toLowerCase();
+        return hay.includes(q);
+      });
+      const selected = gravitySources.filter(s => selectedGravityIds.has(s.id));
+      const merged = [];
+      const seen = new Set();
+      for (const s of selected) { merged.push(s); seen.add(s.id); }
+      for (const s of filtered) { if (!seen.has(s.id)) { merged.push(s); seen.add(s.id); } }
+      gravSelect.innerHTML = "";
+      const show = merged.slice(0, 800);
+      for (const s of show) {
+        const opt = document.createElement("option");
+        opt.value = s.id;
+        opt.textContent = labelForSource(s);
+        opt.selected = selectedGravityIds.has(s.id);
+        gravSelect.appendChild(opt);
+      }
+    }
+
+    function getSelectedGravitySources() {
+      return gravitySources.filter(s => selectedGravityIds.has(s.id));
+    }
+
+    function setSelectedGravityByIds(ids) {
+      selectedGravityIds = new Set(ids);
+      rebuildGravitySelect(gravSearch.value || "");
+    }
+
+    function renderGravityMarkers() {
+      clearGroup(gravityGroup);
+      if (!toggleWarp.checked) return;
+      const sel = getSelectedGravitySources();
+      for (const s of sel) {
+        const m = new THREE.Mesh(gravityMarkerGeo, gravityMarkerMat);
+        m.position.set(s.x || 0, s.z || 0, s.y || 0);
+        m.userData = { __layer: "gravity", id: s.id, label: `${s.system} — ${s.body_name}`, role: `gravity:${s.kind || "source"}`, ...s };
+        gravityGroup.add(m);
+      }
+    }
+
+    // ---------- Auto Global (Voxel-Capped) ----------
+    function getAutoKindsSet() {
+      const sel = new Set();
+      if (!autoKinds) return sel;
+      for (const opt of autoKinds.selectedOptions) sel.add(opt.value);
+      return sel;
+    }
+
+    function sourceEffectiveWeight(s, exp) {
+      const w = (typeof s.weight === "number") ? s.weight : (typeof s.mass_msol === "number") ? s.mass_msol : 1.0;
+      const ww = Math.max(0, Number(w) || 0);
+      return Math.pow(ww, exp);
+    }
+
+    function yieldToUI() {
+      return new Promise(res => requestAnimationFrame(() => res()));
+    }
+
+    function insertTopK(arr, item, k) {
+      let i = 0;
+      while (i < arr.length && arr[i].wEff >= item.wEff) i++;
+      arr.splice(i, 0, item);
+      if (arr.length > k) arr.length = k;
+    }
+
+    async function recomputeAutoGlobalSources() {
+      if (!gravitySources?.length) return;
+      const voxel = Math.max(1, Number(autoVoxel?.value || 750));
+      const perVoxel = Math.max(1, Math.min(10, Number(autoPerVoxel?.value || 1)));
+      const K = Math.max(10, Math.min(2000, Number(autoK?.value || 160)));
+      const exp = Number(autoWeightExp?.value || 1.0);
+      const kindsSet = getAutoKindsSet();
+      const t0 = performance.now();
+      if (autoGlobalStats) autoGlobalStats.textContent = "Auto set: computing…";
+
+      const vox = new Map();
+      const N = gravitySources.length;
+      const chunk = 9000;
+
+      for (let i = 0; i < N; i++) {
+        const s = gravitySources[i];
+        const kind = s.kind || "";
+        if (kindsSet.size && !kindsSet.has(kind)) continue;
+        const x = Number(s.x), y = Number(s.y), z = Number(s.z);
+        if (!Number.isFinite(x) || !Number.isFinite(y) || !Number.isFinite(z)) continue;
+        const wEff = sourceEffectiveWeight(s, exp);
+        if (!(wEff > 0)) continue;
+        const ix = Math.floor(x / voxel), iy = Math.floor(y / voxel), iz = Math.floor(z / voxel);
+        const key = `${ix},${iy},${iz}`;
+        let arr = vox.get(key);
+        if (!arr) { arr = []; vox.set(key, arr); }
+        insertTopK(arr, { s, wEff }, perVoxel);
+        if ((i % chunk) === 0) await yieldToUI();
+      }
+
+      const voxelReps = [];
+      for (const [key, arr] of vox.entries()) {
+        let sum = 0;
+        for (const it of arr) sum += it.wEff;
+        voxelReps.push({ key, sum, arr });
+      }
+      voxelReps.sort((a,b) => b.sum - a.sum);
+
+      const out = [];
+      for (const v of voxelReps) {
+        for (const it of v.arr) {
+          out.push(it.s);
+          if (out.length >= K) break;
+        }
+        if (out.length >= K) break;
+      }
+
+      autoGlobalSources = out;
+      autoGlobalMeta = { voxels: vox.size, selected: out.length, usedKinds: Array.from(kindsSet.values()).sort() };
+      const t1 = performance.now();
+      if (autoGlobalStats) {
+        autoGlobalStats.textContent = `Auto set: ${autoGlobalMeta.selected} sources from ${autoGlobalMeta.voxels} voxels (kinds=${autoGlobalMeta.usedKinds.join(",") || "ALL"}) in ${(t1 - t0).toFixed(0)}ms`;
+      }
+    }
+
+    // ---------- Warp Core ----------
+    function warpDisplacementAtXYZ(x, y, z, sources, strength01, soft, maxDisp, out) {
+      let dx = 0, dy = 0, dz = 0;
+      const soft2 = soft * soft;
+      const k = strength01 * 80_000_000;
+
+      for (let i = 0; i < sources.length; i++) {
+        const s = sources[i];
+        const sx = s.x || 0, sy = s.y || 0, sz = s.z || 0;
+        const vx = x - sx, vy = y - sy, vz = z - sz;
+        const r2 = vx*vx + vy*vy + vz*vz + soft2;
+        const r = Math.sqrt(r2);
+        const r3 = r2 * r;
+        const w = (typeof s.weight === "number") ? s.weight : ((typeof s.mass_msol === "number") ? s.mass_msol : 1.0);
+        const f = (-k * w) / (r3 + 1e-12);
+        dx += vx * f; dy += vy * f; dz += vz * f;
+      }
+
+      let mag = Math.sqrt(dx*dx + dy*dy + dz*dz);
+      if (mag > maxDisp) {
+        const s = maxDisp / (mag + 1e-9);
+        dx *= s; dy *= s; dz *= s;
+        mag = maxDisp;
+      }
+      out.set(dx, dy, dz);
+      return mag;
+    }
+
+    function getHeatSettings() {
+      const enabled = !!toggleWarpHeat?.checked;
+      const hot = new THREE.Color(warpHeatColor?.value || "#ffcc00");
+      const pivot = Math.max(0.10, Number(warpHeatPivot?.value || 0.60));
+      return { enabled, hot, pivot };
+    }
+
+    function buildWarpGrid(group, mat, center, halfSize, div, steps, sources, strength01, soft, maxDisp, strengthScale, baseColorHex) {
+      clearGroup(group);
+      if (!sources.length) return null;
+
+      const S = halfSize;
+      const Cx = center.x, Cy = center.y, Cz = center.z;
+      const lines = [];
+      const colors = [];
+
+      const heat = getHeatSettings();
+      const baseCol = new THREE.Color(baseColorHex || "#00ffff");
+      const br = baseCol.r, bg = baseCol.g, bb = baseCol.b;
+      const hr = heat.hot.r,  hg = heat.hot.g,  hb = heat.hot.b;
+      const pivot = heat.pivot;
+
+      const tmp0 = new THREE.Vector3();
+      const tmp1 = new THREE.Vector3();
+
+      function pushSegColor(t) {
+        t = smoothstep01(t);
+        const r = br + (hr - br) * t;
+        const g = bg + (hg - bg) * t;
+        const b = bb + (hb - bb) * t;
+        colors.push(r,g,b, r,g,b);
+      }
+
+      function addLine(ax, ay, az, bx, by, bz) {
+        const dx = (bx - ax); const dy = (by - ay); const dz = (bz - az);
+        for (let i = 0; i < steps; i++) {
+          const t0 = i / steps; const t1 = (i + 1) / steps;
+          const x0 = ax + dx * t0; const y0 = ay + dy * t0; const z0 = az + dz * t0;
+          const x1 = ax + dx * t1; const y1 = ay + dy * t1; const z1 = az + dz * t1;
+
+          const m0 = warpDisplacementAtXYZ(x0, y0, z0, sources, strength01 * strengthScale, soft, maxDisp, tmp0);
+          const m1 = warpDisplacementAtXYZ(x1, y1, z1, sources, strength01 * strengthScale, soft, maxDisp, tmp1);
+
+          const q0x = x0 + tmp0.x; const q0y = y0 + tmp0.y; const q0z = z0 + tmp0.z;
+          const q1x = x1 + tmp1.x; const q1y = y1 + tmp1.y; const q1z = z1 + tmp1.z;
+
+          lines.push(q0x, q0z, q0y,  q1x, q1z, q1y);
+          const dev = 0.5 * (m0 + m1);
+          const tHeat = heat.enabled ? (dev / (maxDisp * pivot)) : 0.0;
+          pushSegColor(tHeat);
+        }
+      }
+
+      for (let i = 0; i <= div; i++) {
+        const a = -S + (2*S) * (i / div);
+        for (let j = 0; j <= div; j++) {
+          const b = -S + (2*S) * (j / div);
+          addLine(-S + Cx, a + Cy, b + Cz,   S + Cx, a + Cy, b + Cz);
+          addLine(a + Cx, -S + Cy, b + Cz,   a + Cx, S + Cy, b + Cz);
+          addLine(a + Cx, b + Cy, -S + Cz,   a + Cx, b + Cy, S + Cz);
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(lines, 3));
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geo.computeBoundingSphere?.();
+      const grid = new THREE.LineSegments(geo, mat);
+      grid.userData = { __layer: "warp", id: "WARP_GRID", label: "Warp Grid", role: "analysis:warp_grid" };
+      group.add(grid);
+      return grid;
+    }
+
+    function buildWarpGridSlice(group, mat, center, halfSize, div, steps, sources, strength01, soft, maxDisp, strengthScale, mode, baseColorHex) {
+      clearGroup(group);
+      if (!sources.length) return null;
+
+      const S = halfSize;
+      const Cx = center.x, Cy = center.y, Cz = center.z;
+      const lines = [];
+      const colors = [];
+
+      const heat = getHeatSettings();
+      const baseCol = new THREE.Color(baseColorHex || "#4444ff");
+      const br = baseCol.r, bg = baseCol.g, bb = baseCol.b;
+      const hr = heat.hot.r,  hg = heat.hot.g,  hb = heat.hot.b;
+      const pivot = heat.pivot;
+
+      const tmp0 = new THREE.Vector3();
+      const tmp1 = new THREE.Vector3();
+
+      function pushSegColor(t) {
+        t = smoothstep01(t);
+        const r = br + (hr - br) * t;
+        const g = bg + (hg - bg) * t;
+        const b = bb + (hb - bb) * t;
+        colors.push(r,g,b, r,g,b);
+      }
+
+      function addLine(ax, ay, az, bx, by, bz) {
+        const dx = (bx - ax); const dy = (by - ay); const dz = (bz - az);
+        for (let i = 0; i < steps; i++) {
+          const t0 = i / steps; const t1 = (i + 1) / steps;
+          const x0 = ax + dx * t0; const y0 = ay + dy * t0; const z0 = az + dz * t0;
+          const x1 = ax + dx * t1; const y1 = ay + dy * t1; const z1 = az + dz * t1;
+
+          const m0 = warpDisplacementAtXYZ(x0, y0, z0, sources, strength01 * strengthScale, soft, maxDisp, tmp0);
+          const m1 = warpDisplacementAtXYZ(x1, y1, z1, sources, strength01 * strengthScale, soft, maxDisp, tmp1);
+
+          const q0x = x0 + tmp0.x; const q0y = y0 + tmp0.y; const q0z = z0 + tmp0.z;
+          const q1x = x1 + tmp1.x; const q1y = y1 + tmp1.y; const q1z = z1 + tmp1.z;
+
+          lines.push(q0x, q0z, q0y,  q1x, q1z, q1y);
+          const dev = 0.5 * (m0 + m1);
+          const tHeat = heat.enabled ? (dev / (maxDisp * pivot)) : 0.0;
+          pushSegColor(tHeat);
+        }
+      }
+
+      for (let i = 0; i <= div; i++) {
+        const a = -S + (2*S) * (i / div);
+        if (mode === "xy") {
+          addLine(-S + Cx, a + Cy, 0 + Cz,   S + Cx, a + Cy, 0 + Cz);
+          addLine(a + Cx, -S + Cy, 0 + Cz,   a + Cx, S + Cy, 0 + Cz);
+        } else if (mode === "xz") {
+          addLine(-S + Cx, 0 + Cy, a + Cz,   S + Cx, 0 + Cy, a + Cz);
+          addLine(a + Cx, 0 + Cy, -S + Cz,   a + Cx, 0 + Cy, S + Cz);
+        } else if (mode === "yz") {
+          addLine(0 + Cx, -S + Cy, a + Cz,   0 + Cx, S + Cy, a + Cz);
+          addLine(0 + Cx, a + Cy, -S + Cz,   0 + Cx, a + Cy, S + Cz);
+        }
+      }
+
+      const geo = new THREE.BufferGeometry();
+      geo.setAttribute("position", new THREE.Float32BufferAttribute(lines, 3));
+      geo.setAttribute("color", new THREE.Float32BufferAttribute(colors, 3));
+      geo.computeBoundingSphere?.();
+      const grid = new THREE.LineSegments(geo, mat);
+      grid.userData = { __layer: "warp", id: "WARP_GLOBAL_SLICE", label: "Warp Global Slice", role: "analysis:warp_grid_global_slice" };
+      group.add(grid);
+      return grid;
+    }
+
+    function rebuildWarpGrids() {
+      clearGroup(warpLocalGroup);
+      clearGroup(warpGlobalGroup);
+      if (!toggleWarp.checked) return;
+
+      const localSources = getSelectedGravitySources();
+      const strength01 = Number(warpStrength.value);
+      const soft = Number(warpSoft.value);
+      warpLineMatGlobal.opacity = Number(globalOpacity?.value ?? warpLineMatGlobal.opacity);
+
+      const colLocal = warpColorLocal?.value || "#00ffff";
+      const colGlobal = warpColorGlobal?.value || "#4444ff";
+
+      if (toggleWarpLocal.checked) {
+        if (!localSources.length) {
+          appendStatus("Local warp: select at least 1 gravity source (or use Focus System).");
+        } else {
+          const S = Number(warpSize.value);
+          const div = Number(warpDiv.value);
+          const maxDisp = Math.min(6000, Math.max(350, S * 0.50));
+          let C = null;
+          if (focusCenter) {
+            C = focusCenter.clone();
+          } else {
+            let cx=0, cy=0, cz=0;
+            for (const s of localSources) { cx += (s.x||0); cy += (s.y||0); cz += (s.z||0); }
+            cx /= localSources.length; cy /= localSources.length; cz /= localSources.length;
+            C = new THREE.Vector3(cx, cy, cz);
+          }
+          buildWarpGrid(
+            warpLocalGroup, warpLineMatLocal,
+            C, S, div, 40,
+            localSources, strength01, soft, maxDisp,
+            1.0, colLocal
+          );
+        }
+      }
+
+      if (toggleWarpGlobal.checked && gravityExtents) {
+        const maxAbs = gravityExtents.maxAbs;
+        const halfOverride = Number(globalHalfOverride?.value ?? 0);
+        const halfScale = Number(globalHalfScale?.value ?? 1.05);
+        const globalHalf = (halfOverride > 0) ? Math.max(200, halfOverride) : Math.max(2000, maxAbs * halfScale);
+        const div = Math.max(1, Number(globalDivCtrl?.value ?? 24));
+        const steps = Math.max(2, Number(globalStepsCtrl?.value ?? 10));
+        const ratio = Number(globalMaxDispRatio?.value ?? 0.04);
+        const globalMaxDisp = Math.min(6000, Math.max(200, globalHalf * ratio));
+        const strengthScale = Number(globalStrengthScale?.value ?? 0.25);
+        const mode = (globalMode?.value ?? "xy");
+        const globalSources = (toggleAutoGlobal?.checked && autoGlobalSources?.length) ? autoGlobalSources : localSources;
+
+        if (!globalSources.length) {
+          appendStatus("Global warp: no sources available (auto empty and no manual selection).");
+          return;
+        }
+
+        if (mode === "cube") {
+          buildWarpGrid(
+            warpGlobalGroup, warpLineMatGlobal,
+            new THREE.Vector3(0,0,0),
+            globalHalf, div, steps,
+            globalSources, strength01, soft, globalMaxDisp,
+            strengthScale, colGlobal
+          );
+        } else {
+          buildWarpGridSlice(
+            warpGlobalGroup, warpLineMatGlobal,
+            new THREE.Vector3(0,0,0),
+            globalHalf, div, steps,
+            globalSources, strength01, soft, globalMaxDisp,
+            strengthScale, mode, colGlobal
+          );
+        }
+      }
+      updateGlobalCellInfo();
+    }
+
+    function focusSelected() {
+      const sel = getSelectedGravitySources();
+      if (!sel.length) return;
+      let cx=0, cy=0, cz=0;
+      for (const s of sel) { cx += (s.x||0); cy += (s.y||0); cz += (s.z||0); }
+      cx /= sel.length; cy /= sel.length; cz /= sel.length;
+      controls.target.set(cx, cz, cy);
+      camera.position.set(cx + 600, cz + 400, cy + 600);
+      controls.update();
+    }
+
+    // ---------- Focus System ----------
+    function findSystemRecord(query) {
+      const q = (query || "").trim().toLowerCase();
+      if (!q) return null;
+      if (systemIndex.has(q)) return systemIndex.get(q);
+      for (const [k, v] of systemIndex.entries()) {
+        if (k.includes(q)) return v;
+      }
+      return null;
+    }
+
+    function selectNearestGravityToSystem(systemName, N, radiusLimit, localHalfSize) {
+      const rec = findSystemRecord(systemName);
+      if (!rec) {
+        appendStatus(`Focus system not found: "${systemName}". Try exact spelling or a longer partial.`);
+        return;
+      }
+      focusCenter = new THREE.Vector3(rec.x, rec.y, rec.z);
+      const half = Math.max(100, Number(localHalfSize || 1200));
+      warpSize.value = String(Math.min(20000, Math.max(200, half)));
+      syncLabels();
+      const nn = Math.max(1, Math.min(50, Number(N || 8)));
+      const rmax = Number(radiusLimit || 0);
+      const rows = [];
+      for (const s of gravitySources) {
+        const x = s.x || 0, y = s.y || 0, z = s.z || 0;
+        const dx = x - rec.x, dy = y - rec.y, dz = z - rec.z;
+        const d = Math.sqrt(dx*dx + dy*dy + dz*dz);
+        if (rmax > 0 && d > rmax) continue;
+        rows.push({ d, id: s.id });
+      }
+      rows.sort((a,b) => a.d - b.d);
+      const picked = rows.slice(0, nn).map(r => r.id);
+      setSelectedGravityByIds(picked);
+      renderGravityMarkers();
+      rebuildWarpGrids();
+      controls.target.set(rec.x, rec.z, rec.y);
+      camera.position.set(rec.x + 600, rec.z + 400, rec.y + 600);
+      controls.update();
+      setStatus([
+        `Focused system: ${rec.name}`,
+        `Coords (x,y,z): ${rec.x.toFixed(2)}, ${rec.y.toFixed(2)}, ${rec.z.toFixed(2)}`,
+        `Selected nearest gravity sources: ${picked.length}`,
+        `Local grid centered on focused system.`,
+        "",
+        "Tip: If warp is subtle: increase Strength or decrease Softening / Size.",
+        "Tip: For stronger heat contrast: lower Heat Pivot (or choose a brighter Hot color)."
+      ]);
+    }
+
+    function clearSystemFocus() {
+      focusCenter = null;
+      setStatus("Focus cleared (local warp centers on selected source centroid).");
+      rebuildWarpGrids();
+    }
+
+    // ---------- Events / Toggles ----------
+    toggleGuardian?.addEventListener("change", () => { guardianGroup.visible = !!toggleGuardian.checked; });
+
+    // Omphalos master + permit toggles
+    toggleOmphalos?.addEventListener("change", () => {
+      syncOmphalosVisibility();
+      rebuildCorridor();
+    });
+    toggleOmphalosOpen?.addEventListener("change", () => {
+      syncOmphalosVisibility();
+      rebuildCorridor();
+    });
+    toggleOmphalosPermit?.addEventListener("change", () => {
+      syncOmphalosVisibility();
+      rebuildCorridor();
+    });
+
+    // NEW: permit_points.json toggle
+    togglePermits?.addEventListener("change", () => {
+      syncPermitVisibility();
+    });
+
+    toggleSky?.addEventListener("change", () => { skyGroup.visible = !!toggleSky.checked; });
+    toggleCorridor?.addEventListener("change", () => rebuildCorridor());
+    corridorVector?.addEventListener("change", () => rebuildCorridor());
+    rebuildCorridorBtn?.addEventListener("click", () => rebuildCorridor());
+    clearHighlightBtn?.addEventListener("click", () => clearOmphalosHighlight());
+
+    toggleWarp?.addEventListener("change", () => {
+      gravityGroup.visible = !!toggleWarp.checked;
+      warpLocalGroup.visible = !!(toggleWarp.checked && toggleWarpLocal.checked);
+      warpGlobalGroup.visible = !!(toggleWarp.checked && toggleWarpGlobal.checked);
+      renderGravityMarkers();
+      rebuildWarpGrids();
+    });
+
+    toggleWarpLocal?.addEventListener("change", () => {
+      warpLocalGroup.visible = !!(toggleWarp.checked && toggleWarpLocal.checked);
+      rebuildWarpGrids();
+    });
+
+    toggleWarpGlobal?.addEventListener("change", () => {
+      warpGlobalGroup.visible = !!(toggleWarp.checked && toggleWarpGlobal.checked);
+      rebuildWarpGrids();
+    });
+
+    gravSearch?.addEventListener("input", () => rebuildGravitySelect(gravSearch.value));
+    gravSelect?.addEventListener("change", () => {
+      selectedGravityIds = new Set(Array.from(gravSelect.selectedOptions).map(o => o.value));
+      renderGravityMarkers();
+      rebuildWarpGrids();
+    });
+
+    rebuildWarpBtn?.addEventListener("click", async () => {
+      if (toggleAutoGlobal?.checked) await recomputeAutoGlobalSources();
+      renderGravityMarkers();
+      rebuildWarpGrids();
+    });
+
+    focusSelectedBtn?.addEventListener("click", () => focusSelected());
+
+    [
+      warpStrength, warpSoft, warpSize, warpDiv,
+      globalHalfOverride, globalHalfScale, globalDivCtrl, globalStepsCtrl, globalStrengthScale, globalMaxDispRatio, globalMode,
+      toggleWarpHeat, warpHeatColor, warpHeatPivot
+    ].forEach(el => el?.addEventListener("change", () => rebuildWarpGrids()));
+
+    globalOpacity?.addEventListener("input", () => {
+      warpLineMatGlobal.opacity = Number(globalOpacity.value);
+    });
+
+    focusSystemBtn?.addEventListener("click", () => {
+      selectNearestGravityToSystem(focusSystem.value, focusN.value, focusRadius.value, focusLocalSize.value);
+    });
+    clearFocusBtn?.addEventListener("click", () => clearSystemFocus());
+
+    warpColorLocal?.addEventListener("input", () => { rebuildWarpGrids(); });
+    warpColorGlobal?.addEventListener("input", () => { rebuildWarpGrids(); });
+
+    [toggleAutoGlobal, autoVoxel, autoPerVoxel, autoK, autoWeightExp, autoKinds]
+      .forEach(el => el?.addEventListener("input", async () => {
+        syncLabels();
+        if (toggleAutoGlobal?.checked) await recomputeAutoGlobalSources();
+        rebuildWarpGrids();
+      }));
+
+    rebuildAutoGlobalBtn?.addEventListener("click", async () => {
+      await recomputeAutoGlobalSources();
+      rebuildWarpGrids();
+    });
+
+    useAutoAsSelectionBtn?.addEventListener("click", () => {
+      if (!autoGlobalSources.length) return;
+      setSelectedGravityByIds(autoGlobalSources.map(s => s.id));
+      renderGravityMarkers();
+      rebuildWarpGrids();
+    });
+
+    resetViewBtn?.addEventListener("click", () => {
+      controls.target.set(0, 0, 0);
+      camera.position.set(0, 0, 900);
+      controls.update();
+      appendStatus("View reset.");
+    });
+
+    savePngBtn?.addEventListener("click", () => {
+      try {
+        const a = document.createElement("a");
+        a.download = `unified_map_${Date.now()}.png`;
+        a.href = renderer.domElement.toDataURL("image/png");
+        a.click();
+        appendStatus("Saved PNG.");
+      } catch (e) {
+        appendStatus("Save PNG failed (browser blocked).");
+        console.warn(e);
+      }
+    });
+
+    function isTypingTarget(el) {
+      if (!el) return false;
+      const tag = (el.tagName || "").toLowerCase();
+      return tag === "input" || tag === "textarea" || tag === "select" || el.isContentEditable;
+    }
+
+    window.addEventListener("keydown", async (e) => {
+      if (isTypingTarget(document.activeElement)) return;
+      const k = (e.key || "").toLowerCase();
+      if (k === "r") {
+        if (toggleAutoGlobal?.checked) await recomputeAutoGlobalSources();
+        renderGravityMarkers();
+        rebuildWarpGrids();
+        appendStatus("Warp rebuilt (R).");
+      } else if (k === "c") {
+        rebuildCorridor();
+        appendStatus("Corridor rebuilt (C).");
+      } else if (k === "h") {
+        toggleWarpHeat.checked = !toggleWarpHeat.checked;
+        syncLabels();
+        rebuildWarpGrids();
+        appendStatus(`Heat ${toggleWarpHeat.checked ? "ON" : "OFF"} (H).`);
+      } else if (k === "v") {
+        focusSelected();
+        appendStatus("Focused selected (V).");
+      }
+    });
+
+    // ---------- Tooltip / Raycast ----------
+    const raycaster = new THREE.Raycaster();
+    raycaster.params.Points.threshold = 6;
+    const mouse = new THREE.Vector2();
+    let lastHover = null;
+
+    function hideTooltip() { tooltip.style.display = "none"; lastHover = null; }
+
+    function showTooltipHTML(html, x, y, obj) {
+      tooltip.innerHTML = html;
+      tooltip.style.left = (x + 12) + "px";
+      tooltip.style.top = (y + 12) + "px";
+      tooltip.style.display = "block";
+      lastHover = obj || null;
+    }
+
+    function showTooltip(obj, x, y) {
+      const d = obj.userData || {};
+      const title = d.label || d.id || "Object";
+      const role = d.role ? `Role: ${d.role}` : "";
+      const layer = d.__layer ? `Layer: ${d.__layer}` : "";
+
+      let extra = "";
+      if (d.__layer === "gravity") {
+        extra = [
+          d.kind ? `Kind: ${d.kind}` : "",
+          d.subType ? `SubType: ${d.subType}` : "",
+          (typeof d.weight === "number") ? `Weight: ${d.weight.toFixed(2)}` : ""
+        ].filter(Boolean).join(" • ");
+      }
+
+      showTooltipHTML(
+        `<div><strong>${title}</strong></div>
+         <div class="sub">${[role, layer].filter(Boolean).join(" • ")}</div>
+         ${extra ? `<div class="sub">${extra}</div>` : ""}`,
+        x, y, obj
+      );
+    }
+
+    function showOmphalosPointTooltip(pointsObj, index, x, y) {
+      const groupKey = pointsObj?.userData?.groupKey || "open";
+      const bundle = (groupKey === "permit") ? omphalosPermit : omphalosOpen;
+      const s = bundle.systems[index];
+      if (!s) return;
+
+      const perm = isPermitLockedRecord(s) ? "Permit-Locked" : "Open";
+      const pn = String(s.permit_name || "").trim();
+      const pnLine = pn ? `Permit: ${pn}` : "";
+
+      showTooltipHTML(
+        `<div><strong>${s.name || "(unnamed)"}</strong></div>
+         <div class="sub">Layer: omphalos • ${perm}</div>
+         <div class="sub">x,y,z: ${Number(s.x).toFixed(2)}, ${Number(s.y).toFixed(2)}, ${Number(s.z).toFixed(2)}</div>
+         ${pnLine ? `<div class="sub">${pnLine}</div>` : ""}
+         ${Number.isFinite(s.distance_to_sol) ? `<div class="sub">Dist to Sol: ${s.distance_to_sol.toFixed(2)} ly</div>` : ""}
+        `,
+        x, y, pointsObj
+      );
+    }
+
+    function showPermitPointTooltip(index, x, y) {
+      const s = permitSystems[index];
+      if (!s) return;
+      const pn = String(s.permit || "").trim();
+      showTooltipHTML(
+        `<div><strong>${s.name || "(unnamed)"}</strong></div>
+         <div class="sub">Layer: permits • Permit-locked (extracted)</div>
+         <div class="sub">x,y,z: ${Number(s.x).toFixed(2)}, ${Number(s.y).toFixed(2)}, ${Number(s.z).toFixed(2)}</div>
+         ${pn ? `<div class="sub">Permit: ${pn}</div>` : ""}`,
+        x, y, permitPoints
+      );
+    }
+
+    window.addEventListener("mousemove", (e) => {
+      mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      raycaster.setFromCamera(mouse, camera);
+
+      const objs = [];
+      const collect = (g) => g.traverse(o => {
+        const role = o.userData?.role || "";
+        if (role.startsWith("analysis:warp")) return;
+        if (o.isMesh || o.isLine || o.isPoints) objs.push(o);
+      });
+
+      if (guardianGroup.visible) collect(guardianGroup);
+      if (omphalosGroup.visible) collect(omphalosGroup);
+      if (permitGroup.visible) collect(permitGroup);
+      if (skyGroup.visible) collect(skyGroup);
+      if (corridorGroup.visible) collect(corridorGroup);
+      if (gravityGroup.visible) collect(gravityGroup);
+
+      const hits = raycaster.intersectObjects(objs, false);
+      if (!hits.length) return hideTooltip();
+
+      const hit = hits[0];
+      const obj = hit.object;
+
+      // Omphalos per-point tooltip
+      if (obj?.isPoints && obj.userData?.__layer === "omphalos" && typeof hit.index === "number") {
+        showOmphalosPointTooltip(obj, hit.index, e.clientX, e.clientY);
+        return;
+      }
+
+      // Permit points per-point tooltip
+      if (obj?.isPoints && obj.userData?.__layer === "permits" && typeof hit.index === "number") {
+        showPermitPointTooltip(hit.index, e.clientX, e.clientY);
+        return;
+      }
+
+      if (obj !== lastHover) showTooltip(obj, e.clientX, e.clientY);
+      else {
+        tooltip.style.left = (e.clientX + 12) + "px";
+        tooltip.style.top = (e.clientY + 12) + "px";
+      }
+    });
+
+    window.addEventListener("mouseleave", () => hideTooltip());
+
+    // ---------- Boot ----------
+    async function boot() {
+      setStatus("Loading JSON…");
+      const lines = [];
+      try {
+        const guardian = await loadJSON(PATHS.guardian);
+        addLayerNodesLinks(guardianGroup, guardian, "guardian");
+        lines.push(`Guardian: ${guardian.nodes?.length || 0} nodes`);
+      } catch {
+        guardianGroup.visible = false;
+        toggleGuardian.checked = false;
+        lines.push(`Guardian: (missing) ${PATHS.guardian}`);
+      }
+
+      omphalosData = await loadJSON(PATHS.omphalos);
+      if (!Array.isArray(omphalosData.systems)) {
+        throw new Error("omphalos_map.json: expected top-level key 'systems' (array).");
+      }
+
+      buildOmphalosPointsTwoClouds(omphalosData.systems);
+      indexSystemsForFocus();
+      lines.push(`Omphalos: ${omphalosData.systems.length} systems (open=${omphalosOpen.systems.length}, permit=${omphalosPermit.systems.length})`);
+
+      // NEW: permit_points.json (optional)
+      const permitRows = await tryLoadJSON(PATHS.permit);
+      if (permitRows) {
+        buildPermitPoints(permitRows);
+        lines.push(`Permits: ${permitRows.length} systems (permit_points.json)`);
+      } else {
+        togglePermits.checked = false;
+        permitGroup.visible = false;
+        setPermitCount();
+        lines.push(`Permits: (missing) ${PATHS.permit}`);
+      }
+
+      skyData = await loadJSON(PATHS.sky);
+      addLayerNodesLinks(skyGroup, skyData, "sky");
+      lines.push(`Sky: ${skyData.nodes?.length || 0} nodes, ${skyData.links?.length || 0} links`);
+
+      skyVectors.clear();
+      for (const n of (skyData.nodes || [])) {
+        if (n?.type === "vector") {
+          const v = new THREE.Vector3(n.x || 0, n.y || 0, n.z || 0);
+          if (v.lengthSq() > 1e-12) {
+            const name = (n.constellation_label || n.constellation || n.label || n.id || "Vector");
+            skyVectors.set(name, v.clone());
+          }
+        }
+      }
+      populateCorridorVectors();
+      if (corridorVector.options.length) corridorVector.selectedIndex = 0;
+
+      let g = await tryLoadJSON(PATHS.gravityFull);
+      let used = "gravity_sources_full.json";
+      if (!g) { g = await loadJSON(PATHS.gravity); used = "gravity_sources.json"; }
+      gravityData = g;
+      gravitySources = (gravityData.sources || []).slice();
+      lines.push(`Gravity: ${gravitySources.length} sources (${used})`);
+
+      let maxAbs = 0;
+      for (const s of gravitySources) {
+        maxAbs = Math.max(maxAbs, Math.abs(s.x || 0), Math.abs(s.y || 0), Math.abs(s.z || 0));
+      }
+      gravityExtents = { maxAbs };
+
+      rebuildGravitySelect("");
+      setSelectedGravityByIds(gravitySources.slice(0, 3).map(s => s.id));
+
+      guardianGroup.visible = !!toggleGuardian.checked;
+      syncOmphalosVisibility();
+      syncPermitVisibility();
+      skyGroup.visible = !!toggleSky.checked;
+      corridorGroup.visible = !!toggleCorridor.checked;
+      gravityGroup.visible = !!toggleWarp.checked;
+      warpLocalGroup.visible = !!(toggleWarp.checked && toggleWarpLocal.checked);
+      warpGlobalGroup.visible = !!(toggleWarp.checked && toggleWarpGlobal.checked);
+
+      if (toggleAutoGlobal?.checked) await recomputeAutoGlobalSources();
+      rebuildCorridor();
+      renderGravityMarkers();
+      rebuildWarpGrids();
+      syncLabels();
+      setStatus(lines);
+    }
+
+    boot().catch(err => {
+      console.error(err);
+      setStatus([
+        "Error during boot. Open DevTools Console.",
+        "",
+        String(err?.message || err),
+        "",
+        "Common causes:",
+        "- Wrong PATHS at top",
+        "- Not serving from project root (python -m http.server 8000)",
+        "- omphalos_map.json schema mismatch (needs top-level 'systems')",
+        "- Cache (Ctrl+Shift+R)"
+      ]);
+    });
+
+    function animate() {
+      requestAnimationFrame(animate);
+      controls.update();
+      renderer.render(scene, camera);
+    }
+    animate();
+
+    window.addEventListener("resize", () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+      renderer.setSize(window.innerWidth, window.innerHeight);
+    });
+  </script>
+</body>
+</html>

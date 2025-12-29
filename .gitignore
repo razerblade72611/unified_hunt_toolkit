@@ -4,6 +4,13 @@ data/raw/
 *.gz
 *.json.gz
 
+# Large local dumps (do not commit)
+data/processed/omphalos_systems.csv
+
+# Optional: ignore other huge/raw dumps if you have them
+data/raw/
+*.gz
+
 # Ignore processed outputs by default...
 data/processed/*
 # ...but KEEP the files required to run the Three.js map
